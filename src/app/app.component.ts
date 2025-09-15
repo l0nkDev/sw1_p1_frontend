@@ -27,9 +27,14 @@ import { Router } from '@angular/router';
 })
 export class AppComponent {
   constructor(private router: Router) {}
-  websocket: WebSocketService = new WebSocketService(window.location.pathname.split('/').pop() || ''); 
+  websocket: WebSocketService = new WebSocketService(window.location.pathname.split('/').pop() || '');
 
   ngOnInit(): void {
+    if (this.getUrl() == '') {
+    var id: string = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    this.router.navigate(['/session/' + id]);
+    this.websocket = new WebSocketService(id);
+    }
     this.websocket.getMessages().subscribe(
       (message: string) => {
         this.diagram.nodes = message ? JSON.parse(message).nodes : [];
@@ -42,11 +47,11 @@ export class AppComponent {
   @ViewChild('diagram') public diagram!: DiagramComponent;
 
   public expandMode: ExpandMode = 'Multiple';
-  
+
   public palettes: PaletteModel[] = UMLElements.palettes;
-  
+
   public nodes: NodeModel[] = [];
-  
+
   public connectors: ConnectorModel[] = [];
 
   public getNodeDefaults(node: NodeModel): NodeModel {
