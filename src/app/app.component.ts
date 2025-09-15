@@ -27,7 +27,7 @@ import { Router } from '@angular/router';
 })
 export class AppComponent {
   constructor(private router: Router) {}
-  websocket: WebSocketService = new WebSocketService(''); 
+  websocket: WebSocketService = new WebSocketService(window.location.pathname.split('/').pop() || ''); 
 
   ngOnInit(): void {
     this.websocket.getMessages().subscribe(

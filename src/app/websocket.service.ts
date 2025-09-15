@@ -5,7 +5,7 @@ export class WebSocketService {
   private messageSubject = new Subject<string>();
 
   constructor(sessionId: string) {
-    this.socket = new WebSocket('ws://localhost:8000/ws/session/12312321312'); // Adjust URL as needed
+    this.socket = new WebSocket(`wss://websocket.lonk.dev/ws/session/${sessionId}`); // Adjust URL as needed
 
     this.socket.onopen = (event) => {
       console.log('WebSocket connection opened:', event);
