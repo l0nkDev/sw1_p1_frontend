@@ -9,7 +9,7 @@ export class WebSocketService {
   private messageSubject = new Subject<string>();
 
   constructor() {
-    this.socket = new WebSocket('ws://35.208.168.86:8000/ws/session/12312321312'); // Adjust URL as needed
+    this.socket = new WebSocket('wss://35.208.168.86:443/ws/session/12312321312'); // Adjust URL as needed
 
     this.socket.onopen = (event) => {
       console.log('WebSocket connection opened:', event);
