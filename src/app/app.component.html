@@ -66,6 +66,7 @@
      </style>
   <div class="diagram-umlclass" style="width: 100%;" id="umlClassdiagram">
     <button (click)="saveToDevice()">Save</button>
+    <button (click)="Aux()">Aux</button>
       <div class="sb-mobile-palette-bar">
           <div id="palette-icon" style="float: right;" role="button" class="e-ddb-icons1 e-toggle-palette"></div>
       </div>
@@ -78,10 +79,17 @@
       <div id="diagram-space" class="sb-mobile-diagram">
          <!-- Template reference variable for the diagram component instance -->
         <ejs-diagram #diagram id="diagram" width="100%" height="100%" [getNodeDefaults]="getNodeDefaults"
-        [getConnectorDefaults]="getConnectorDefaults"  [nodes]='nodes'
-          [connectors]='connectors' (created)="created()" (dragEnter)="dragEnter($event)">
+        [getConnectorDefaults]="getConnectorDefaults"  [nodes]='nodes' 
+          [connectors]='connectors' (created)="created()" (dragEnter)="dragEnter($event)" 
+          (collectionChange)="onCollectionChange($event)"
+          (positionChange)="onPositionChange($event)"
+          (sourcePointChange)="onPointChange($event)"
+          (targetPointChange)="onPointChange($event)"
+          (textEdit)="onTextEdit($event)"
+          >
         </ejs-diagram>
       </div>
   </div>
 </div>
+
 
