@@ -1,15 +1,11 @@
-import { Injectable, OnInit } from '@angular/core';
-import { Subject, Observable, Subscription } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
 export class WebSocketService {
   private socket: WebSocket;
   private messageSubject = new Subject<string>();
 
-  constructor() {
-    this.socket = new WebSocket('wss://websocket.lonk.dev/ws/session/12312321312'); // Adjust URL as needed
+  constructor(sessionId: string) {
+    this.socket = new WebSocket('ws://localhost:8000/ws/session/' + sessionId); // Adjust URL as needed
 
     this.socket.onopen = (event) => {
       console.log('WebSocket connection opened:', event);

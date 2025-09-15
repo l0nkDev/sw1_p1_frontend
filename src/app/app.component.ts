@@ -10,6 +10,7 @@ import { NodeModel, ConnectorModel, Connector, PaletteModel, UmlClassifierShapeM
 import { ExpandMode } from '@syncfusion/ej2-navigations';
 import { WebSocketService } from './websocket.service';
 import { UMLElements } from './diagram/palettes';
+import { Router } from '@angular/router';
 
 
 
@@ -25,7 +26,8 @@ import { UMLElements } from './diagram/palettes';
     imports: [ SymbolPaletteModule, DiagramModule ]
 })
 export class AppComponent {
-  constructor(private websocket: WebSocketService) {}
+  constructor(private router: Router) {}
+  websocket: WebSocketService = new WebSocketService(''); 
 
   ngOnInit(): void {
     this.websocket.getMessages().subscribe(
@@ -118,9 +120,10 @@ export class AppComponent {
   }
 
   public Aux() {
-    for (const node of this.diagram.nodes) {
-      console.log(node);
-    }
+    //window.location.replace('/session/' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
+    var sessionid: string = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    this.router.navigate(['/session/' + sessionid]);
+    this.websocket = new WebSocketService(sessionid);
   }
 
   public onCollectionChange(args: any): void {
@@ -138,5 +141,9 @@ export class AppComponent {
   public onTextEdit(args: any): void {
     console.log(args);
     if (args['state'] == 'Completed') this.saveToDevice();
+  }
+
+  public getUrl(): string | undefined {
+    return window.location.pathname.split('/').pop();
   }
 }

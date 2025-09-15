@@ -65,8 +65,7 @@
 
      </style>
   <div class="diagram-umlclass" style="width: 100%;" id="umlClassdiagram">
-    <button (click)="saveToDevice()">Save</button>
-    <button (click)="Aux()">Aux</button>
+    <button (click)="Aux()">{{ getUrl() == null ? 'Crear sesión' : 'Compartir link' }}</button>
       <div class="sb-mobile-palette-bar">
           <div id="palette-icon" style="float: right;" role="button" class="e-ddb-icons1 e-toggle-palette"></div>
       </div>
