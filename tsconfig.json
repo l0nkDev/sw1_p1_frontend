@@ -24,6 +24,6 @@
     "strictInputAccessModifiers": true,
     "strictTemplates": true,
     "strictPropertyInitialization": false,
-    "skipLibCheck": true,
+    "skipLibCheck": true
   }
 }

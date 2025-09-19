@@ -1,4 +1,5 @@
 import { Subject, Observable } from 'rxjs';
+import { environment } from '../environments/environment.development';
 
 export class WebSocketService {
   private socket: WebSocket | null = null;
@@ -10,7 +11,9 @@ export class WebSocketService {
 
   init(sessionId: string) {
     if (sessionId !== '') {
-      this.socket = new WebSocket(`wss://websocket.lonk.dev/ws/session/${sessionId}`); // Adjust URL as needed
+      this.socket = new WebSocket(
+        environment.wsUrl + `/session/${sessionId}`,
+      );
 
       this.socket.onopen = (event) => {
         console.log('WebSocket connection opened:', event);
@@ -23,12 +26,10 @@ export class WebSocketService {
 
       this.socket.onclose = (event) => {
         console.log('WebSocket connection closed:', event);
-        this.socket = new WebSocket(`wss://websocket.lonk.dev/ws/session/${sessionId}`);
       };
 
       this.socket.onerror = (error) => {
         console.error('WebSocket error:', error);
-        this.socket = new WebSocket(`wss://websocket.lonk.dev/ws/session/${sessionId}`);
       };
     }
   }

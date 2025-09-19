@@ -1,0 +1,137 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">UMLonk.dev</a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarNavDropdown"
+      aria-controls="navbarNavDropdown"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <button class="btn" (click)="Aux()">
+            {{ getUrl() === "" ? "Crear sesión" : "Compartir link" }}
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="control-section">
+  <style>
+    .e-toggle-palette::before {
+      content: "\e700";
+    }
+
+    .diagram-umlclass .sb-mobile-palette {
+      width: 250px;
+      height: 559px;
+      float: left;
+    }
+
+    .diagram-umlclass .sb-mobile-palette-bar {
+      display: none;
+    }
+
+    .diagram-umlclass .sb-mobile-diagram {
+      width: calc(99% - 242px);
+      height: 559px;
+      float: left;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-left: none;
+    }
+
+    @media (max-width: 550px) {
+      .diagram-umlclass .sb-mobile-palette {
+        z-index: 19;
+        position: absolute;
+        display: none;
+        transition:
+          transform 300ms linear,
+          visibility 0s linear 300ms;
+        width: 39%;
+        height: 100%;
+      }
+      .diagram-umlclass .sb-mobile-diagram {
+        width: 60%;
+        height: 100%;
+        float: left;
+        left: 0px;
+      }
+      .diagram-umlclass .sb-mobile-palette-bar {
+        display: block;
+        width: 100%;
+        background: #fafafa;
+        padding: 10px 10px;
+        border: 0.5px solid #e0e0e0;
+        min-height: 40px;
+      }
+      #diagram-umlclass #palette-icon {
+        font-size: 20px;
+      }
+    }
+
+    .diagram-umlclass .sb-mobile-palette-open {
+      position: absolute;
+      display: block;
+      right: 15px;
+    }
+  </style>
+  <div
+    class="diagram-umlclass"
+    style="width: 100%; height: 100%"
+    id="umlClassdiagram"
+  >
+    <div class="sb-mobile-palette-bar">
+      <div
+        id="palette-icon"
+        style="float: right"
+        role="button"
+        class="e-ddb-icons1 e-toggle-palette"
+      ></div>
+    </div>
+    <div id="palette-space" class="sb-mobile-palette">
+      <!-- Template reference variable for the symbolpalette component instance -->
+      <ejs-symbolpalette
+        id="symbolpalette"
+        [expandMode]="expandMode"
+        [palettes]="palettes"
+        [getSymbolInfo]="getSymbolInfo"
+        width="100%"
+        height="100%"
+        [symbolHeight]="90"
+        [symbolWidth]="90"
+        [symbolMargin]="symbolMargin"
+        [getNodeDefaults]="getSymbolDefaults"
+      >
+      </ejs-symbolpalette>
+    </div>
+    <div id="diagram-space" class="sb-mobile-diagram">
+      <!-- Template reference variable for the diagram component instance -->
+      <ejs-diagram
+        #diagram
+        id="diagram"
+        width="100%"
+        height="100%"
+        [getNodeDefaults]="getNodeDefaults"
+        [getConnectorDefaults]="getConnectorDefaults"
+        [nodes]="nodes"
+        [connectors]="connectors"
+        (created)="created()"
+        (dragEnter)="dragEnter($event)"
+        (collectionChange)="onCollectionChange($event)"
+        (positionChange)="onPositionChange($event)"
+        (sourcePointChange)="onPointChange($event)"
+        (targetPointChange)="onPointChange($event)"
+        (textEdit)="onTextEdit($event)"
+      >
+      </ejs-diagram>
+    </div>
+  </div>
+</div>
