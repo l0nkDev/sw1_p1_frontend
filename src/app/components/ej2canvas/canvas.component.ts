@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Component,
   ViewEncapsulation,
@@ -12,6 +13,9 @@ import {
   MarginModel,
   SymbolPaletteModule,
   DiagramModule,
+  ConnectorEditingService,
+  UndoRedoService,
+  DiagramContextMenuService,
 } from '@syncfusion/ej2-angular-diagrams';
 import {
   NodeModel,
@@ -21,10 +25,10 @@ import {
   UmlClassifierShapeModel,
 } from '@syncfusion/ej2-diagrams';
 import { ExpandMode } from '@syncfusion/ej2-navigations';
-import { WebSocketService } from '../websocket.service';
-import { UMLElements } from '../diagram/palettes';
+import { WebSocketService } from '../../websocket.service';
+import { UMLElements } from '../../diagram/palettes';
 import { Router } from '@angular/router';
-import { GenericInterface } from '../interfaces/generic.interface';
+import { GenericInterface } from '../../interfaces/generic.interface';
 
 @Component({
   selector: 'app-root',
@@ -33,6 +37,7 @@ import { GenericInterface } from '../interfaces/generic.interface';
   encapsulation: ViewEncapsulation.None,
   standalone: true,
   imports: [SymbolPaletteModule, DiagramModule],
+  providers: [ConnectorEditingService, UndoRedoService, DiagramContextMenuService],
 })
 export class CanvasComponent implements OnInit {
   readonly router = inject(Router);
@@ -167,11 +172,20 @@ export class CanvasComponent implements OnInit {
   }
 
   public onPositionChange(args: GenericInterface): void {
-    if (args.state == 'Completed') this.saveToDevice();
+    if (args.state == 'Completed') {
+      console.log(this.diagram.nodes);
+      this.saveToDevice();
+    }
   }
 
-  public onPointChange(args: GenericInterface): void {
-    if (args.state == 'Completed') this.saveToDevice();
+  public onPointChange(args: any): void {
+    if (args.state == 'Completed') {
+      const connector: ConnectorModel = this.diagram.getObject(args.connector.properties.id);
+      console.log(connector);
+      if (args.connector.properties.sourceID === args.connector.properties.targetID) 
+        connector.type = 'Orthogonal';
+      else connector.type = 'Straight';
+    }
   }
 
   public onTextEdit(args: GenericInterface): void {
@@ -181,5 +195,13 @@ export class CanvasComponent implements OnInit {
 
   public getUrl(): string | undefined {
     return window.location.pathname.split('/').pop();
+  }
+
+  public PrintNodes(): void {
+    console.log(this.diagram.nodes);
+  }
+
+  public PrintConnectors(): void {
+    console.log(this.diagram.connectors);
   }
 }

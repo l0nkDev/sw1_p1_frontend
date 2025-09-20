@@ -35,28 +35,6 @@ export class UMLElements {
           shape: { type: 'UmlClassifier', relationship: 'Composition' },
         },
         {
-          id: 'BiDirectional',
-          type: 'Straight',
-          sourcePoint: { x: 300, y: 200 },
-          targetPoint: { x: 400, y: 300 },
-          shape: {
-            type: 'UmlClassifier',
-            relationship: 'Aggregation',
-            associationType: 'BiDirectional',
-          },
-        },
-        {
-          id: 'Directional',
-          type: 'Straight',
-          sourcePoint: { x: 500, y: 200 },
-          targetPoint: { x: 600, y: 300 },
-          shape: {
-            type: 'UmlClassifier',
-            relationship: 'Association',
-            associationType: 'Directional',
-          },
-        },
-        {
           id: 'Association',
           type: 'Straight',
           sourcePoint: { x: 700, y: 200 },
