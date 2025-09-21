@@ -20,7 +20,6 @@ export class WebSocketService {
       };
 
       this.socket.onmessage = (event) => {
-        console.log('Message from server:', JSON.parse(event.data));
         this.messageSubject.next(event.data);
       };
 

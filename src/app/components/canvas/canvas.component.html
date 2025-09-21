@@ -1,0 +1,175 @@
+<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
+<!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
+<div class="control-section">
+  <style>
+    .e-toggle-palette::before {
+      content: "\e700";
+    }
+
+    .diagram-umlclass .sb-mobile-palette {
+      width: 10vw;
+      height: calc(100vh - 56px);
+      float: left;
+    }
+
+    .diagram-umlclass .sb-mobile-palette-bar {
+      display: none;
+    }
+
+    .diagram-umlclass .sb-mobile-diagram {
+      width: 70vw;
+      height: calc(100vh - 56px);
+      float: left;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-left: none;
+    }
+
+    @media (max-width: 550px) {
+      .diagram-umlclass .sb-mobile-palette {
+        z-index: 19;
+        position: absolute;
+        display: none;
+        transition:
+          transform 300ms linear,
+          visibility 0s linear 300ms;
+        width: 39%;
+        height: 100%;
+      }
+      .diagram-umlclass .sb-mobile-diagram {
+        width: 60%;
+        height: 100%;
+        float: left;
+        left: 0px;
+      }
+      .diagram-umlclass .sb-mobile-palette-bar {
+        display: block;
+        width: 100%;
+        background: #fafafa;
+        padding: 10px 10px;
+        border: 0.5px solid #e0e0e0;
+        min-height: 40px;
+      }
+      #diagram-umlclass #palette-icon {
+        font-size: 20px;
+      }
+    }
+
+    .diagram-umlclass .sb-mobile-palette-open {
+      position: absolute;
+      display: block;
+      right: 15px;
+    }
+  </style>
+  <div
+    class="diagram-umlclass"
+    style="width: 100%; height: 100%"
+    id="umlClassdiagram"
+  >
+    <div class="sb-mobile-palette-bar">
+      <div
+        id="palette-icon"
+        style="float: right"
+        role="button"
+        class="e-ddb-icons1 e-toggle-palette"
+      ></div>
+    </div>
+    <div id="palette-space" class="sb-mobile-palette">
+      <!-- Template reference variable for the symbolpalette component instance -->
+      <ejs-symbolpalette
+        id="symbolpalette"
+        [expandMode]="expandMode"
+        [palettes]="palettes"
+        [getSymbolInfo]="getSymbolInfo"
+        width="100%"
+        height="100%"
+        [symbolHeight]="90"
+        [symbolWidth]="90"
+        [symbolMargin]="symbolMargin"
+        [getNodeDefaults]="getSymbolDefaults"
+      >
+      </ejs-symbolpalette>
+    </div>
+    <div id="diagram-space" class="sb-mobile-diagram">
+      <!-- Template reference variable for the diagram component instance -->
+      <ejs-diagram
+        #diagram
+        id="diagram"
+        width="100%"
+        height="100%"
+        [getNodeDefaults]="getNodeDefaults"
+        [getConnectorDefaults]="getConnectorDefaults"
+        [nodes]="nodes"
+        [connectors]="connectors"
+        (created)="created()"
+        (dragEnter)="dragEnter($event)"
+        (collectionChange)="onCollectionChange($event)"
+        (positionChange)="onPositionChange($event)"
+        (sourcePointChange)="onPointChange($event)"
+        (targetPointChange)="onPointChange($event)"
+        (click)="onClick($event)"
+      >
+      </ejs-diagram>
+    </div>
+  </div>
+</div>
+
+<div class="scrollspy-example bg-body-tertiary p-3 rounded-2" style="position: absolute; right: 0px; width: 20vw; background-color: white; padding: 10px; height: calc(100vh - 56px);">
+  @if (SelectedClass !== null)
+  {
+    <div class="mb-3">
+      <label for="exampleFormControlInput1" class="form-label">Name</label>
+      <input class="form-control" [(ngModel)]="ClassName" >
+    </div>
+    <div class="mb-3">
+      <div style="justify-content: space-between; display: flex; align-items: center; padding-bottom: 5px;">
+        <label for="exampleFormControlInput1" class="form-label">Properties</label>
+        <button class="btn btn-outline-success" (click)="addProperty()">➕</button>
+      </div>
+      @for (property of ClassProperties; track $index)
+      {
+        @if (!property.delete)
+        {
+          <div class = "input-group mb-1">
+            <button class="btn btn-outline-danger" (click)="deleteProperty(property)">🗑️</button>
+            <input class="form-control" [(ngModel)]="property.name">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">{{property.type}}</button>
+            <ul class="dropdown-menu">
+              <div *ngFor="let entry of DataType | keyvalue">
+                <li><a class="dropdown-item" (click)="setType(property, entry.value)">{{entry.value}}</a></li>
+              </div>
+            </ul>
+          </div>
+        }
+      }
+    </div>
+    <button class="btn btn-outline-secondary" (click)="applyChanges()">Aplicar</button>
+  }
+  @if (SelectedConnector !== null) {
+    <div class="mb-3">
+      <label for="exampleFormControlInput1" class="form-label">Name</label>
+      <input class="form-control" disabled [(ngModel)]="SelectedConnector" >
+    </div>
+    <div class="mb-3">
+      <label for="exampleFormControlInput1" class="form-label">Multiplicity</label>
+      <div class = "input-group mb-1">
+        <input class="form-control" disabled [(ngModel)]="SourceTitle" >
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">{{SourceMultiplicity}}</button>
+        <ul class="dropdown-menu">
+          <div *ngFor="let entry of Multiplicity | keyvalue">
+            <li><a class="dropdown-item" (click)="setSourceMult(entry.value)">{{entry.value}}</a></li>
+          </div>
+        </ul>
+      </div>
+      <div class = "input-group mb-1">
+        <input class="form-control" disabled [(ngModel)]="TargetTitle" >
+        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">{{TargetMultiplicity}}</button>
+        <ul class="dropdown-menu">
+          <div *ngFor="let entry of Multiplicity | keyvalue">
+            <li><a class="dropdown-item" (click)="setTargetMult(entry.value)">{{entry.value}}</a></li>
+          </div>
+        </ul>
+      </div>
+    </div>
+    <button class="btn btn-outline-secondary" (click)="applyChanges()">Aplicar</button>
+  }
+</div>

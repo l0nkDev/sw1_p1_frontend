@@ -1,11 +1,12 @@
 import { PaletteModel } from '@syncfusion/ej2-angular-diagrams';
+import { DataType } from '../interfaces/classproperty.interface';
 
 export class UMLElements {
   public static palettes: PaletteModel[] = [
     {
-      id: 'UmlActivity',
+      id: 'umlConnectors',
       expanded: true,
-      title: 'UML Classifier Nodes',
+      title: '',
       symbols: [
         {
           id: 'class',
@@ -13,33 +14,52 @@ export class UMLElements {
           shape: {
             type: 'UmlClassifier',
             classShape: {
-              attributes: [],
+              attributes: [{
+                name: "Id", type: DataType.long
+              }],
               methods: [],
               name: 'Class',
             },
             classifier: 'Class',
           },
         },
-      ],
-    },
-    {
-      id: 'umlConnectors',
-      expanded: true,
-      title: 'UML Classifier Connectors',
-      symbols: [
         {
           id: 'Composition',
           sourcePoint: { x: 100, y: 200 },
           targetPoint: { x: 200, y: 300 },
           type: 'Straight',
-          shape: { type: 'UmlClassifier', relationship: 'Composition' },
+          shape: {
+            type: 'UmlClassifier',
+            relationship: 'Composition',
+            multiplicity: {
+              type: 'ManyToMany',
+              source: {
+                optional: true,
+                lowerBounds: '1',
+                upperBounds: '1',
+              },
+              target: { optional: true, lowerBounds: '1', upperBounds: '1' },
+            },
+          },
         },
         {
           id: 'Association',
           type: 'Straight',
           sourcePoint: { x: 700, y: 200 },
           targetPoint: { x: 800, y: 300 },
-          shape: { type: 'UmlClassifier', relationship: 'Association' },
+          shape: {
+            type: 'UmlClassifier',
+            relationship: 'Association',
+            multiplicity: {
+              type: 'ManyToMany',
+              source: {
+                optional: true,
+                lowerBounds: '1',
+                upperBounds: '1',
+              },
+              target: { optional: true, lowerBounds: '1', upperBounds: '1' },
+            }
+          },
         },
         {
           id: 'Inheritance',
