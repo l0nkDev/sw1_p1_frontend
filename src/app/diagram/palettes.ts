@@ -15,7 +15,7 @@ export class UMLElements {
             type: 'UmlClassifier',
             classShape: {
               attributes: [{
-                name: "Id", type: DataType.long
+                name: "name", type: DataType.string
               }],
               methods: [],
               name: 'Class',

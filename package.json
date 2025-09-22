@@ -26,6 +26,8 @@
     "@syncfusion/ej2-angular-diagrams": "^31.1.18",
     "@syncfusion/ej2-material-theme": "~31.1.18",
     "bootstrap": "^5.3.8",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
@@ -35,7 +37,9 @@
     "@angular/cli": "^19.2.7",
     "@angular/compiler-cli": "^19.2.0",
     "@angular/localize": "^19.2.0",
+    "@types/file-saver": "^2.0.7",
     "@types/jasmine": "~5.1.0",
+    "@types/jszip": "^3.4.0",
     "angular-eslint": "20.3.0",
     "eslint": "^9.35.0",
     "eslint-config-prettier": "^10.1.8",

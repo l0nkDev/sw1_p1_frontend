@@ -36,6 +36,7 @@ import { Router } from '@angular/router';
 import { GenericInterface } from '../../interfaces/generic.interface';
 import { FormsModule } from '@angular/forms';
 import { KeyValuePipe, NgFor } from '@angular/common';
+import { CodeGenerationService } from '../../services/codeGeneration/codegeneration.service';
 
 @Component({
   selector: 'app-root',
@@ -325,5 +326,9 @@ export class CanvasComponent implements OnInit {
 
   setTargetMult(mult: Multiplicity): void {
     this.TargetMultiplicity = mult;
+  }
+
+  Generate(): void {
+    CodeGenerationService.generateZipDownload(this.diagram);
   }
 }
