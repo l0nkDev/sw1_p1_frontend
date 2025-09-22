@@ -131,6 +131,9 @@ export class CodeGenerationService {
   static PascalCase(string: string): string {
     return string[0].toUpperCase() + string.substring(1);
   }
+  static SnakeCase(string: string): string {
+    return string.replace(' ', '').replace('-', '').toLowerCase()
+  }
 
   static GetClassObject(
     classID: string,
@@ -159,30 +162,30 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin
-@RequestMapping(value = "api/v1/")
+@RequestMapping(value = "api/v1/${this.PascalCase(classObject.Title)}s")
 public class ${this.PascalCase(classObject.Title)}Controller {
 
     @Autowired
     private ${this.PascalCase(classObject.Title)}Service ${this.CamelCase(classObject.Title)}Service;
 
-    @GetMapping("/get${this.CamelCase(classObject.Title)}s")
+    @GetMapping("")
     public List<${this.PascalCase(classObject.Title)}DTO> get${this.PascalCase(classObject.Title)}() {
         return ${this.CamelCase(classObject.Title)}Service.getAll${this.PascalCase(classObject.Title)}s();
     }
 
-    @PostMapping("/save${this.CamelCase(classObject.Title)}")
+    @PostMapping("")
     public ${this.PascalCase(classObject.Title)}DTO save${this.PascalCase(classObject.Title)}(@RequestBody ${this.PascalCase(classObject.Title)}DTO ${this.CamelCase(classObject.Title)}DTO) {
         return ${this.CamelCase(classObject.Title)}Service.save${this.PascalCase(classObject.Title)}(${this.CamelCase(classObject.Title)}DTO);
     }
 
-    @PutMapping("/update${this.CamelCase(classObject.Title)}")
+    @PutMapping("")
     public ${this.PascalCase(classObject.Title)}DTO update${this.PascalCase(classObject.Title)}(@RequestBody ${this.PascalCase(classObject.Title)}DTO ${this.CamelCase(classObject.Title)}DTO) {
         return ${this.CamelCase(classObject.Title)}Service.update${this.PascalCase(classObject.Title)}(${this.CamelCase(classObject.Title)}DTO);
     }
 
-    @DeleteMapping("delete${this.CamelCase(classObject.Title)}/{${this.CamelCase(classObject.Title)}Id}")
-    public String delete${this.PascalCase(classObject.Title)}(@PathVariable int ${this.CamelCase(classObject.Title)}Id) {
-        return ${this.CamelCase(classObject.Title)}Service.delete${this.PascalCase(classObject.Title)}(${this.CamelCase(classObject.Title)}Id);
+    @DeleteMapping("{Id}")
+    public String delete${this.PascalCase(classObject.Title)}(@PathVariable int Id) {
+        return ${this.CamelCase(classObject.Title)}Service.delete${this.PascalCase(classObject.Title)}(Id);
     }
 }`;
     return string;
@@ -205,38 +208,31 @@ public class ${this.PascalCase(classObject.Title)}DTO {
     private Long id;
 `;
     classObject.Properties.forEach((property) => {
-      string += `   private ${property.Type} ${this.CamelCase(property.Name)};\n`;
+      string += `    private ${property.Type} ${this.CamelCase(property.Name)};\n`;
     });
     connectors.forEach((connector) => {
-      if (connector.Source.Class.Id === classObject.Id) {
-        const sourceMult = connector.Source.Multiplicity;
-        const targetMult = connector.Target.Multiplicity;
+      if (connector.Source.Class.Id === classObject.Id || connector.Target.Class.Id === classObject.Id) {
+        const isSource = connector.Source.Class.Id === classObject.Id;
+        //const sourceMult = connector.Source.Multiplicity;
+        //const targetMult = connector.Target.Multiplicity;
         if (this.IsOneToOne(connector)) {
-          if (sourceMult !== Multiplicity.One || targetMult !== Multiplicity.ZeroToOne) {
-            string += `    private Long ${this.CamelCase(connector.Target.Class.Title)}Id;`;
-          }
-        }
-      }
-      if (connector.Target.Class.Id === classObject.Id) {
-        const sourceMult = connector.Source.Multiplicity;
-        const targetMult = connector.Target.Multiplicity;
-        if (this.IsOneToOne(connector)) {
-          if (sourceMult === Multiplicity.One && targetMult === Multiplicity.ZeroToOne) {
-            string += `    private Long ${this.CamelCase(connector.Source.Class.Title)}Id;`;
-          }
+          if (isSource) string += `    private Long ${this.CamelCase(connector.Target.Class.Title)}Id;`;
+          else string += `    private Long ${this.CamelCase(connector.Source.Class.Title)}Id;`;
         }
       }
     });
-    string += `}`;
+    string += `\n}`;
     return string;
   }
 
   static ClassToEntity(classObject: ClassObject, connectors: ConnectorObject[]): string {
     let string =
-`import jakarta.persistence.Entity;
+`import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.ManyToMany;
@@ -258,28 +254,39 @@ public class ${this.PascalCase(classObject.Title)} {
       string += `    private ${property.Type} ${this.CamelCase(property.Name)};\n`;
     });
     connectors.forEach((connector) => {
-      if (connector.Source.Class.Id === classObject.Id) {
+      if (connector.Source.Class.Id === classObject.Id || connector.Target.Class.Id === classObject.Id) {
+        const isSource = connector.Source.Class.Id === classObject.Id;
         const sourceMult = connector.Source.Multiplicity;
+        const source = connector.Source.Class.Title;
         const targetMult = connector.Target.Multiplicity;
+        const target = connector.Target.Class.Title;
         if (this.IsOneToOne(connector)) {
-          if (sourceMult !== Multiplicity.One || targetMult !== Multiplicity.ZeroToOne) {
-            string = `import com.umlonk.generated.model.${this.PascalCase(connector.Target.Class.Title)};\n` + string;
-            string += `    @OneToOne\n    private ${this.PascalCase(connector.Target.Class.Title)} ${this.CamelCase(connector.Target.Class.Title)};`;
-          }
-        }
-      }
-      if (connector.Target.Class.Id === classObject.Id) {
-        const sourceMult = connector.Source.Multiplicity;
-        const targetMult = connector.Target.Multiplicity;
-        if (this.IsOneToOne(connector)) {
-          if (sourceMult === Multiplicity.One && targetMult === Multiplicity.ZeroToOne) {
-            string = `import com.umlonk.generated.model.${this.PascalCase(connector.Source.Class.Title)};\n` + string;
-            string += `   @OneToOne \n    private ${this.PascalCase(connector.Source.Class.Title)} ${this.CamelCase(connector.Source.Class.Title)};`;
+          if (isSource) {
+            if (sourceMult !== Multiplicity.ZeroToOne || targetMult !== Multiplicity.One) {
+              string = `import com.umlonk.generated.model.${this.PascalCase(target)};\n` + string;
+              string += `    @OneToOne(cascade=CascadeType.ALL)
+                  @JoinColumn(name="${this.SnakeCase(target)}_id")
+                  private ${this.PascalCase(target)} ${this.CamelCase(target)};`;
+            } else {
+              string += `    @OneToOne(mappedBy="${this.CamelCase(source)}")
+                  private ${this.PascalCase(target)} ${this.CamelCase(target)};`;
+            }
+          } else {
+            if (sourceMult === Multiplicity.ZeroToOne && targetMult === Multiplicity.ZeroToOne) {
+              string = `import com.umlonk.generated.model.${this.PascalCase(source)};\n` + string;
+              string += `    @OneToOne
+                  @JoinColumn(name="${this.SnakeCase(source)}_id")
+                  private ${this.PascalCase(source)} ${this.CamelCase(source)};`;
+            } else {
+              string = `import com.umlonk.generated.model.${this.PascalCase(source)};\n` + string;
+              string += `    @OneToOne(mappedBy="${this.SnakeCase(target)}")
+                  private ${this.PascalCase(source)} ${this.CamelCase(source)};`;
+            }
           }
         }
       }
     });
-    string += `}`;
+    string += `\n}`;
     return 'package com.umlonk.generated.model;\n\n' + string;
   }
 
