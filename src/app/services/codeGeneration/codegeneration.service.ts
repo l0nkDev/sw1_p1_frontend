@@ -117,7 +117,7 @@ export class CodeGenerationService {
           },
           Target: {
             Class: this.GetClassObject(connector.targetID, classes)!,
-            Multiplicity: connector.annotations![0].content as Multiplicity,
+            Multiplicity: connector.annotations![1].content as Multiplicity,
           },
         });
     });
@@ -151,17 +151,9 @@ export class CodeGenerationService {
 
 import com.umlonk.generated.dto.${Ptitle}DTO;
 import com.umlonk.generated.service.${Ptitle}Service;
-import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin
@@ -197,16 +189,13 @@ public class ${Ptitle}Controller {
 
   static ClassToDTO(classObject: ClassObject, connectors: ConnectorObject[]): string {
     const Ptitle = this.PascalCase(classObject.Title);
-    //const Ctitle = this.CamelCase(classObject.Title);
     let string =
 
 `package com.umlonk.generated.dto;
 
 import jakarta.persistence.Entity;
 import java.util.List;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
@@ -218,33 +207,24 @@ public class ${Ptitle}DTO {
       string += `    private ${property.Type} ${this.CamelCase(property.Name)};\n`;
     });
     connectors.forEach((connector) => {
-      if (connector.Source.Class.Id === classObject.Id || connector.Target.Class.Id === classObject.Id) {
-        const isSource = connector.Source.Class.Id === classObject.Id;
+      const source = connector.Source.Class;
+      const target = connector.Target.Class;
+      if (source.Id === classObject.Id || target.Id === classObject.Id) {
+        const isSource = source.Id === classObject.Id;
         if (this.IsOneToOne(connector)) {
-          if (isSource) string += `    private Long ${this.CamelCase(connector.Target.Class.Title)}Id;`;
-          else string += `    private Long ${this.CamelCase(connector.Source.Class.Title)}Id;`;
+          string += `    private Long ${this.CamelCase(isSource ? target.Title : source.Title)}Id;\n`;
         }
       }
     });
-    string += `\n}`;
+    string += `}`;
     return string;
   }
 
   static ClassToEntity(classObject: ClassObject, connectors: ConnectorObject[]): string {
     let string =
-`import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.ManyToMany;
+`import jakarta.persistence.*;
 import java.util.List;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
 @Entity
 @NoArgsConstructor
@@ -259,39 +239,23 @@ public class ${this.PascalCase(classObject.Title)} {
       string += `    private ${property.Type} ${this.CamelCase(property.Name)};\n`;
     });
     connectors.forEach((connector) => {
-      if (connector.Source.Class.Id === classObject.Id || connector.Target.Class.Id === classObject.Id) {
+        const source = connector.Source.Class;
+        const target = connector.Target.Class;
+      if (source.Id === classObject.Id || target.Id === classObject.Id) {
         const isSource = connector.Source.Class.Id === classObject.Id;
-        const sourceMult = connector.Source.Multiplicity;
-        const source = connector.Source.Class.Title;
-        const targetMult = connector.Target.Multiplicity;
-        const target = connector.Target.Class.Title;
         if (this.IsOneToOne(connector)) {
-          if (isSource) {
-            if (sourceMult !== Multiplicity.ZeroToOne || targetMult !== Multiplicity.One) {
-              string = `import com.umlonk.generated.model.${this.PascalCase(target)};\n` + string;
-              string += `    @OneToOne(cascade=CascadeType.ALL)
-                  @JoinColumn(name="${this.SnakeCase(target)}_id")
-                  private ${this.PascalCase(target)} ${this.CamelCase(target)};`;
-            } else {
-              string += `    @OneToOne(mappedBy="${this.CamelCase(source)}")
-                  private ${this.PascalCase(target)} ${this.CamelCase(target)};`;
-            }
-          } else {
-            if (sourceMult === Multiplicity.ZeroToOne && targetMult === Multiplicity.ZeroToOne) {
-              string = `import com.umlonk.generated.model.${this.PascalCase(source)};\n` + string;
-              string += `    @OneToOne
-                  @JoinColumn(name="${this.SnakeCase(source)}_id")
-                  private ${this.PascalCase(source)} ${this.CamelCase(source)};`;
-            } else {
-              string = `import com.umlonk.generated.model.${this.PascalCase(source)};\n` + string;
-              string += `    @OneToOne(mappedBy="${this.SnakeCase(target)}")
-                  private ${this.PascalCase(source)} ${this.CamelCase(source)};`;
-            }
-          }
+          const belongsToSource = connector.Source.Multiplicity === Multiplicity.ZeroToOne || connector.Target.Multiplicity === Multiplicity.One;
+          console.log(connector.Source.Class.Title + ' - ' + connector.Target.Class.Title)
+          console.log(`Class: ${classObject.Title}`)
+          console.log(`isSource: ${isSource}`)
+          console.log(`belongsToSource: ${belongsToSource}`)
+          string += `    @OneToOne(${isSource === belongsToSource ? 'cascade=CascadeType.ALL' : `mappedBy = "${this.CamelCase(isSource ? source.Title : target.Title)}"`})\n`;
+          if (isSource === belongsToSource) string += `    @JoinColumn(name="${this.SnakeCase(isSource ? target.Title : source.Title)}_id")\n`;
+          string += `    private ${this.PascalCase(isSource ? target.Title : source.Title)} ${this.CamelCase(isSource ? target.Title : source.Title)}\n;`;
         }
       }
     });
-    string += `\n}`;
+    string += `}`;
     return 'package com.umlonk.generated.model;\n\n' + string;
   }
 
@@ -333,10 +297,7 @@ import com.umlonk.generated.repo.${Ptitle}Repo;
 string += `import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.util.List;
-import org.modelmapper.ConfigurationException;
-import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
-import org.modelmapper.TypeToken;
+import org.modelmapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -470,20 +431,5 @@ public class ${Ptitle}Service {
       connector.Source.Multiplicity === Multiplicity.OneToMany ||
       connector.Source.Multiplicity === Multiplicity.ZeroToMany
     ))
-  }
-
-  static RelationAnalysis(classObject: ClassObject, connector: ConnectorObject): string | null {
-    let result = '';
-    const source = connector.Source.Class.Id;
-    const target = connector.Target.Class.Id;
-    if (classObject.Id === source && classObject.Id === target) result += 'Recursive.';
-    else if (classObject.Id === source) result += 'Source.';
-    else if (classObject.Id === target) result += 'Target.';
-    else return null;
-    if (this.IsOneToOne(connector)) return result + 'OneToOne';
-    if (this.IsOneToMany(connector)) return result + 'OneToMany';
-    if (this.IsManyToOne(connector)) return result + 'ManyToOne';
-    if (this.IsManyToMany(connector)) return result + 'ManyToMany';
-    return result;
   }
 }
