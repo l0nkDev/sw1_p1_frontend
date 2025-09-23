@@ -56,7 +56,7 @@ export class CodeGenerationService {
       );
       loadedZip.file(
         `src/main/java/com/umlonk/generated/service/${this.PascalCase(classObj.Title)}Service.java`,
-        this.ClassToService(classObj),
+        this.ClassToService(classObj, jsonData.Connectors),
       );
     });
     loadedZip.generateAsync({ type: 'blob' }).then((content) => {
@@ -143,11 +143,14 @@ export class CodeGenerationService {
   }
 
   static ClassToController(classObject: ClassObject): string {
+    const Ptitle = this.PascalCase(classObject.Title);
+    const Ctitle = this.CamelCase(classObject.Title);
     const string =
+
 `package com.umlonk.generated.controller;
 
-import com.umlonk.generated.dto.${this.PascalCase(classObject.Title)}DTO;
-import com.umlonk.generated.service.${this.PascalCase(classObject.Title)}Service;
+import com.umlonk.generated.dto.${Ptitle}DTO;
+import com.umlonk.generated.service.${Ptitle}Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,37 +165,41 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @CrossOrigin
-@RequestMapping(value = "api/v1/${this.PascalCase(classObject.Title)}s")
-public class ${this.PascalCase(classObject.Title)}Controller {
+@RequestMapping(value = "api/v1/${Ptitle}s")
+public class ${Ptitle}Controller {
 
     @Autowired
-    private ${this.PascalCase(classObject.Title)}Service ${this.CamelCase(classObject.Title)}Service;
+    private ${Ptitle}Service ${Ctitle}Service;
 
     @GetMapping("")
-    public List<${this.PascalCase(classObject.Title)}DTO> get${this.PascalCase(classObject.Title)}() {
-        return ${this.CamelCase(classObject.Title)}Service.getAll${this.PascalCase(classObject.Title)}s();
+    public List<${Ptitle}DTO> get${Ptitle}() {
+        return ${Ctitle}Service.getAll${Ptitle}s();
     }
 
     @PostMapping("")
-    public ${this.PascalCase(classObject.Title)}DTO save${this.PascalCase(classObject.Title)}(@RequestBody ${this.PascalCase(classObject.Title)}DTO ${this.CamelCase(classObject.Title)}DTO) {
-        return ${this.CamelCase(classObject.Title)}Service.save${this.PascalCase(classObject.Title)}(${this.CamelCase(classObject.Title)}DTO);
+    public ${Ptitle}DTO save${Ptitle}(@RequestBody ${Ptitle}DTO ${Ctitle}DTO) {
+        return ${Ctitle}Service.save${Ptitle}(${Ctitle}DTO);
     }
 
     @PutMapping("")
-    public ${this.PascalCase(classObject.Title)}DTO update${this.PascalCase(classObject.Title)}(@RequestBody ${this.PascalCase(classObject.Title)}DTO ${this.CamelCase(classObject.Title)}DTO) {
-        return ${this.CamelCase(classObject.Title)}Service.update${this.PascalCase(classObject.Title)}(${this.CamelCase(classObject.Title)}DTO);
+    public ${Ptitle}DTO update${Ptitle}(@RequestBody ${Ptitle}DTO ${Ctitle}DTO) {
+        return ${Ctitle}Service.update${Ptitle}(${Ctitle}DTO);
     }
 
     @DeleteMapping("{Id}")
-    public String delete${this.PascalCase(classObject.Title)}(@PathVariable int Id) {
-        return ${this.CamelCase(classObject.Title)}Service.delete${this.PascalCase(classObject.Title)}(Id);
+    public String delete${Ptitle}(@PathVariable int Id) {
+        return ${Ctitle}Service.delete${Ptitle}(Id);
     }
-}`;
+}`
+;
     return string;
   }
 
   static ClassToDTO(classObject: ClassObject, connectors: ConnectorObject[]): string {
+    const Ptitle = this.PascalCase(classObject.Title);
+    //const Ctitle = this.CamelCase(classObject.Title);
     let string =
+
 `package com.umlonk.generated.dto;
 
 import jakarta.persistence.Entity;
@@ -204,7 +211,7 @@ import lombok.Data;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ${this.PascalCase(classObject.Title)}DTO {
+public class ${Ptitle}DTO {
     private Long id;
 `;
     classObject.Properties.forEach((property) => {
@@ -213,8 +220,6 @@ public class ${this.PascalCase(classObject.Title)}DTO {
     connectors.forEach((connector) => {
       if (connector.Source.Class.Id === classObject.Id || connector.Target.Class.Id === classObject.Id) {
         const isSource = connector.Source.Class.Id === classObject.Id;
-        //const sourceMult = connector.Source.Multiplicity;
-        //const targetMult = connector.Target.Multiplicity;
         if (this.IsOneToOne(connector)) {
           if (isSource) string += `    private Long ${this.CamelCase(connector.Target.Class.Title)}Id;`;
           else string += `    private Long ${this.CamelCase(connector.Source.Class.Title)}Id;`;
@@ -291,61 +296,137 @@ public class ${this.PascalCase(classObject.Title)} {
   }
 
   static ClassToRepo(classObject: ClassObject): string {
+    const Ptitle = this.PascalCase(classObject.Title);
     const string =
 `package com.umlonk.generated.repo;
 
-import com.umlonk.generated.model.${this.PascalCase(classObject.Title)};
+import com.umlonk.generated.model.${Ptitle};
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ${this.PascalCase(classObject.Title)}Repo extends JpaRepository<${this.PascalCase(classObject.Title)}, Long> {
+public interface ${Ptitle}Repo extends JpaRepository<${Ptitle}, Long> {
 }`;
     return string;
   }
 
-  static ClassToService(classObject: ClassObject): string {
-    const string =
+  static ClassToService(classObject: ClassObject, connectors: ConnectorObject[]): string {
+    const Ptitle = this.PascalCase(classObject.Title);
+    const Ctitle = this.CamelCase(classObject.Title);
+    let string =
 `package com.umlonk.generated.service;
 
-import com.umlonk.generated.model.${this.PascalCase(classObject.Title)};
-import com.umlonk.generated.dto.${this.PascalCase(classObject.Title)}DTO;
-import com.umlonk.generated.repo.${this.PascalCase(classObject.Title)}Repo;
+import com.umlonk.generated.model.${Ptitle};
+import com.umlonk.generated.dto.${Ptitle}DTO;
+import com.umlonk.generated.repo.${Ptitle}Repo;
+`;
+    connectors.forEach((connector) => {
+        const source = connector.Source.Class;
+        const target = connector.Target.Class;
+        if (source.Id === classObject.Id || target.Id === classObject.Id) {
+          const isSource = source.Id === classObject.Id;
+          if (this.IsOneToOne(connector)) {
+            string += `import com.umlonk.generated.model.${this.PascalCase(isSource ? target.Title : source.Title)};\n`;
+          }
+        }
+    });
+string += `import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import org.modelmapper.ConfigurationException;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @Transactional
-public class ${this.PascalCase(classObject.Title)}Service {
+public class ${Ptitle}Service {
 
     @Autowired
-    private ${this.PascalCase(classObject.Title)}Repo ${this.CamelCase(classObject.Title)}Repository;
+    private ${Ptitle}Repo ${Ctitle}Repository;
 
     @Autowired
     private ModelMapper modelMapper;
 
-    public List<${this.PascalCase(classObject.Title)}DTO> getAll${this.PascalCase(classObject.Title)}s() {
-        List<${this.PascalCase(classObject.Title)}> ${this.CamelCase(classObject.Title)}List = ${this.CamelCase(classObject.Title)}Repository.findAll();
-        return modelMapper.map(${this.CamelCase(classObject.Title)}List, new TypeToken<List<${this.PascalCase(classObject.Title)}DTO>>() {}.getType());
+    @Autowired
+    private EntityManager entityManager;
+
+    private void mapperSetup() {
+        try {
+            modelMapper.addMappings(new PropertyMap<${Ptitle}DTO, ${Ptitle}>() {
+                @Override
+                protected void configure() {
+`;
+    connectors.forEach((connector) => {
+      const source = connector.Source.Class;
+      const target = connector.Target.Class;
+      if (source.Id === classObject.Id || target.Id === classObject.Id) {
+        const isSource = source.Id === classObject.Id;
+        if (this.IsOneToOne(connector))
+          string += `                    skip(destination.get${this.PascalCase(isSource ? target.Title : source.Title)}());\n`
+        }
+      }
+    );
+    string += `           }
+            });
+      } catch(ConfigurationException a) {}
     }
 
-    public ${this.PascalCase(classObject.Title)}DTO save${this.PascalCase(classObject.Title)}(${this.PascalCase(classObject.Title)}DTO ${this.CamelCase(classObject.Title)}DTO) {
-        ${this.CamelCase(classObject.Title)}Repository.save(modelMapper.map(${this.CamelCase(classObject.Title)}DTO, ${this.PascalCase(classObject.Title)}.class));
-        return ${this.CamelCase(classObject.Title)}DTO;
+    public List<${Ptitle}DTO> getAll${Ptitle}s() {
+        List<${Ptitle}> ${Ctitle}List = ${Ctitle}Repository.findAll();
+        return modelMapper.map(${Ctitle}List, new TypeToken<List<${Ptitle}DTO>>() {}.getType());
     }
 
-    public ${this.PascalCase(classObject.Title)}DTO update${this.PascalCase(classObject.Title)}(${this.PascalCase(classObject.Title)}DTO ${this.CamelCase(classObject.Title)}DTO) {
-        ${this.CamelCase(classObject.Title)}Repository.save(modelMapper.map(${this.CamelCase(classObject.Title)}DTO, ${this.PascalCase(classObject.Title)}.class));
-        return ${this.CamelCase(classObject.Title)}DTO;
+    public ${Ptitle}DTO save${Ptitle}(${Ptitle}DTO ${Ctitle}DTO) {
+        mapperSetup();
+        ${Ptitle} ${Ctitle} = modelMapper.map(${Ctitle}DTO, ${Ptitle}.class);
+`;
+    connectors.forEach((connector) => {
+      const source = connector.Source.Class;
+      const target = connector.Target.Class;
+      if (source.Id === classObject.Id || target.Id === classObject.Id) {
+        const isSource = source.Id === classObject.Id;
+        const property = this.PascalCase(isSource ? target.Title : source.Title);
+        if (this.IsOneToOne(connector))
+          string +=
+`        if (${Ctitle}DTO.get${property}Id() != null)
+            ${Ctitle}.set${property}(entityManager.getReference(${property}.class, ${Ctitle}DTO.get${property}Id()));
+        else ${Ctitle}.set${property}(null);\n`
+      }
+    });
+        string +=
+`        ${Ctitle}Repository.save(${Ctitle});
+        return ${Ctitle}DTO;
     }
 
-    public String delete${this.PascalCase(classObject.Title)}(long ${this.CamelCase(classObject.Title)}Id) {
-        ${this.CamelCase(classObject.Title)}Repository.deleteById((${this.CamelCase(classObject.Title)}Id));
-        return "${this.PascalCase(classObject.Title)} deleted";
+    public ${Ptitle}DTO update${Ptitle}(${Ptitle}DTO ${Ctitle}DTO) {
+        mapperSetup();
+        ${Ptitle} ${Ctitle} = ${Ctitle}Repository.findById(${Ctitle}DTO.getId()).orElseThrow();
+        modelMapper.map(${Ctitle}DTO, ${Ctitle});
+`;
+    connectors.forEach((connector) => {
+      const source = connector.Source.Class;
+      const target = connector.Target.Class;
+      if (source.Id === classObject.Id || target.Id === classObject.Id) {
+        const isSource = source.Id === classObject.Id;
+        const property = this.PascalCase(isSource ? target.Title : source.Title);
+        if (this.IsOneToOne(connector))
+          string +=
+`        if (${Ctitle}DTO.get${property}Id() != null)
+            ${Ctitle}.set${property}(entityManager.getReference(${property}.class, ${Ctitle}DTO.get${property}Id()));
+        else ${Ctitle}.set${property}(null);\n`
+      }
+    });
+        string +=
+`        ${Ctitle}Repository.save(${Ctitle});
+        return ${Ctitle}DTO;
+    }
+
+    public String delete${Ptitle}(long ${Ctitle}Id) {
+        ${Ctitle}Repository.deleteById((${Ctitle}Id));
+        return "${Ptitle} deleted";
     }
 }`;
     return string;
@@ -389,5 +470,20 @@ public class ${this.PascalCase(classObject.Title)}Service {
       connector.Source.Multiplicity === Multiplicity.OneToMany ||
       connector.Source.Multiplicity === Multiplicity.ZeroToMany
     ))
+  }
+
+  static RelationAnalysis(classObject: ClassObject, connector: ConnectorObject): string | null {
+    let result = '';
+    const source = connector.Source.Class.Id;
+    const target = connector.Target.Class.Id;
+    if (classObject.Id === source && classObject.Id === target) result += 'Recursive.';
+    else if (classObject.Id === source) result += 'Source.';
+    else if (classObject.Id === target) result += 'Target.';
+    else return null;
+    if (this.IsOneToOne(connector)) return result + 'OneToOne';
+    if (this.IsOneToMany(connector)) return result + 'OneToMany';
+    if (this.IsManyToOne(connector)) return result + 'ManyToOne';
+    if (this.IsManyToMany(connector)) return result + 'ManyToMany';
+    return result;
   }
 }
