@@ -17,14 +17,17 @@
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav">
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="false">
             Generate
           </a>
           <div class="dropdown-menu" style="width: 300px;">
             <div class="px-4 py-3">
               <div class="mb-3">
                 <label for="PromptInput" class="form-label">Prompt</label>
-                <input type="text" #PromptInput class="form-control" id="PromptInput" placeholder="Office">
+                <div class="input-group mb-3">
+                  <input type="text" #PromptInput class="form-control" id="PromptInput" placeholder="Office">
+                  <button (click)="StartSpeechRecognition()" class="btn btn-outline-secondary">🎤</button>
+                </div>
               </div>
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="radioDefault" id="radioDefault1" value="class" checked [(ngModel)]="selectedValue">

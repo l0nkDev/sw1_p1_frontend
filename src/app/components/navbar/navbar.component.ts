@@ -1,18 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component, inject, Input } from '@angular/core';
+import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { ConnectorObject, DiagramObject } from '../../interfaces/serializedDiagram.interface';
 import { CanvasComponent } from '../canvas/canvas.component';
 import { FormsModule } from '@angular/forms';
 import { CodeGenerationService } from '../../services/codeGeneration/codegeneration.service';
-//import saveAs from 'file-saver';
+import { VoiceRecognitionService } from '../../services/voice-recognition/voice-recognition.service';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: 'navbar.component.html',
   imports: [FormsModule]
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit{
+  
+  private voiceRecognitionService = inject(VoiceRecognitionService);
+  @ViewChild('PromptInput') private promptInput!: HTMLInputElement;
   @Input() canvas: CanvasComponent | null = null;
   readonly http = inject(HttpClient)
   selectedValue = 'class';
@@ -62,6 +65,10 @@ export class NavbarComponent {
     ZeroToMany = '0...*',
     OneToMany = '1...*',
   }`
+
+    ngOnInit() {
+      this.voiceRecognitionService.init();
+    }
 
   public SubmitPrompt(prompt: string) {
     switch (this.selectedValue) {
@@ -177,5 +184,16 @@ export class NavbarComponent {
   
   GenerateJava(): void {
     CodeGenerationService.generateZipDownload(this.canvas!.diagram);
+  }
+
+  StartSpeechRecognition(): void {
+    this.voiceRecognitionService.start();
+    this.promptInput.value = 'lololol testeando xdd';
+  }
+
+  StopSpeechRecognition(): void {
+    this.voiceRecognitionService.stop();
+    this.promptInput.value = this.voiceRecognitionService.text;
+    this.voiceRecognitionService.text = '';
   }
 }

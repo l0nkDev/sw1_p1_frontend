@@ -220,10 +220,6 @@ public class ${this.PascalCase(classObject.Title)} {
         const isSource = connector.Source.Class.Id === classObject.Id;
         if (this.IsOneToOne(connector)) {
           const belongsToSource = connector.Source.Multiplicity === Multiplicity.ZeroToOne || connector.Target.Multiplicity === Multiplicity.One;
-          console.log(connector.Source.Class.Title + ' - ' + connector.Target.Class.Title)
-          console.log(`Class: ${classObject.Title}`)
-          console.log(`isSource: ${isSource}`)
-          console.log(`belongsToSource: ${belongsToSource}`)
           string += `    @OneToOne(${isSource === belongsToSource ? 'cascade=CascadeType.ALL' : `mappedBy = "${this.CamelCase(isSource ? source.Title : target.Title)}"`})\n`;
           if (isSource === belongsToSource) string += `    @JoinColumn(name="${this.SnakeCase(isSource ? target.Title : source.Title)}_id")\n`;
           string += `    private ${this.PascalCase(isSource ? target.Title : source.Title)} ${this.CamelCase(isSource ? target.Title : source.Title)}\n;`;
