@@ -21,25 +21,26 @@ import {
   ConnectorEditingService,
   UndoRedoService,
   DiagramContextMenuService,
+  PrintAndExportService,
 } from '@syncfusion/ej2-angular-diagrams';
 import {
   NodeModel,
   ConnectorModel,
   Connector,
   PaletteModel,
-  AnnotationConstraints,
+  AnnotationConstraints
 } from '@syncfusion/ej2-diagrams';
 import { ExpandMode } from '@syncfusion/ej2-navigations';
-import { WebSocketService } from '../../websocket.service';
+import { WebSocketService } from '../../services/websocket/websocket.service';
 import { UMLElements } from '../../diagram/palettes';
 import { Router } from '@angular/router';
 import { GenericInterface } from '../../interfaces/generic.interface';
 import { FormsModule } from '@angular/forms';
 import { KeyValuePipe, NgFor } from '@angular/common';
-import { CodeGenerationService } from '../../services/codeGeneration/codegeneration.service';
+import { ClassObject, ConnectorObject } from '../../interfaces/serializedDiagram.interface';
 
 @Component({
-  selector: 'app-root',
+  selector: 'app-canvas',
   templateUrl: 'canvas.component.html',
   styleUrls: ['canvas.component.css'],
   encapsulation: ViewEncapsulation.None,
@@ -55,13 +56,21 @@ import { CodeGenerationService } from '../../services/codeGeneration/codegenerat
     ConnectorEditingService,
     UndoRedoService,
     DiagramContextMenuService,
+    PrintAndExportService
   ],
 })
 export class CanvasComponent implements OnInit {
+
+  @ViewChild('diagram') public diagram!: DiagramComponent;
+
+  readonly router = inject(Router)
   readonly clientid: string =
     Math.random().toString(36).substring(2, 15) +
-    Math.random().toString(36).substring(2, 15);
-  readonly router = inject(Router);
+    Math.random().toString(36).substring(2, 15);;
+  public expandMode: ExpandMode = 'Multiple';
+  public palettes: PaletteModel[] = UMLElements.palettes;
+  public nodes: NodeModel[] = [];
+  public connectors: ConnectorModel[] = [];
   SelectedClass: string | null = null;
   SelectedConnector: string | null = null;
   ClassName = '';
@@ -106,13 +115,6 @@ export class CanvasComponent implements OnInit {
       () => console.log('WebSocket connection completed.'),
     );
   }
-
-  @ViewChild('diagram') public diagram!: DiagramComponent;
-
-  public expandMode: ExpandMode = 'Multiple';
-  public palettes: PaletteModel[] = UMLElements.palettes;
-  public nodes: NodeModel[] = [];
-  public connectors: ConnectorModel[] = [];
 
   public getNodeDefaults(node: NodeModel): NodeModel {
     node.style = { fill: '#FFFFFF', strokeColor: 'black' };
@@ -266,12 +268,14 @@ export class CanvasComponent implements OnInit {
 
   public applyChanges(): void {
     if (this.SelectedClass != null) {
+      this.ClassName = this.ClassName.replace(/\s/g, "");
       this.diagram.nodes.forEach((node) => {
         if (node.id === this.SelectedClass + '_umlClass_header')
           node.annotations![0].content = this.ClassName;
 
         if (node.id === this.SelectedClass)
           this.ClassProperties.forEach((property) => {
+            property.name = property.name.replace(/\s/g, "")
             console.log(property.id);
             if (property.id != null || property.delete)
               this.diagram.remove(this.diagram.getNodeObject(property.id!));
@@ -328,7 +332,56 @@ export class CanvasComponent implements OnInit {
     this.TargetMultiplicity = mult;
   }
 
-  Generate(): void {
-    CodeGenerationService.generateZipDownload(this.diagram);
+  public AddClass(newClass: ClassObject | null, randomizeName = true): void {
+    console.log(newClass);
+    if (newClass == null) return;
+    const attributes: { name: string; type: DataType; }[] = [];
+    newClass.Properties.forEach((property) => {
+      attributes.push({name: property.Name, type: property.Type})
+    });
+    const newClassObj: NodeModel =
+      {
+        id: randomizeName ? ('class_' + Math.random().toString(36).substring(2, 15)).replace(' ', '') : newClass.Id ,
+        borderColor: 'white',
+        shape: {
+          type: 'UmlClassifier',
+          classShape: {
+            attributes: attributes,
+            methods: [],
+            name: newClass.Title,
+          },
+          classifier: 'Class',
+        },
+      };
+    this.diagram.add(newClassObj);
+  }
+
+  public AddConnector(newConnector: ConnectorObject | null): void {
+    if (newConnector == null) return;
+    const newConnectorObj: ConnectorModel = 
+    {
+      id: ('association_' + Math.random().toString(36).substring(2, 15)).replace(' ', ''),
+      sourceID: newConnector.Source.Class.Id,
+      targetID: newConnector.Target.Class.Id,
+      type: newConnector.Source.Class.Id === newConnector.Target.Class.Id ? 'Orthogonal' : 'Straight',
+      shape: {
+        type: 'UmlClassifier',
+        relationship: 'Association',
+        multiplicity: {
+          type: 'ManyToMany',
+          source: {
+            optional: true,
+            lowerBounds: newConnector.Source.Multiplicity.split('...')[0],
+            upperBounds: newConnector.Source.Multiplicity.split('...')[1],
+          },
+          target: { 
+            optional: true, 
+            lowerBounds: newConnector.Target.Multiplicity.split('...')[0], 
+            upperBounds: newConnector.Target.Multiplicity.split('...')[1] 
+          },
+        },
+      },
+    }
+    this.diagram.add(newConnectorObj as NodeModel);
   }
 }

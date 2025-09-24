@@ -3,32 +3,7 @@ import { saveAs } from 'file-saver';
 import { Diagram } from '@syncfusion/ej2-angular-diagrams';
 import { DataType } from '../../interfaces/classproperty.interface';
 import { Multiplicity } from '../../interfaces/multiplicity.interface';
-
-interface Property {
-  Name: string;
-  Type: DataType;
-}
-
-interface Connection {
-  Class: ClassObject;
-  Multiplicity: Multiplicity;
-}
-
-interface ClassObject {
-  Id: string;
-  Title: string;
-  Properties: Property[];
-}
-
-interface ConnectorObject {
-  Source: Connection;
-  Target: Connection;
-}
-
-interface DiagramObject {
-  Classes: ClassObject[];
-  Connectors: ConnectorObject[];
-}
+import { ClassObject, ConnectorObject, DiagramObject } from '../../interfaces/serializedDiagram.interface';
 
 export class CodeGenerationService {
   public static async generateZipDownload(diagram: Diagram) {

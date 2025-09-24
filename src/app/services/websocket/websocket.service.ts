@@ -1,5 +1,5 @@
 import { Subject, Observable } from 'rxjs';
-import { environment } from '../environments/environment.development';
+import { environment } from '../../../environments/environment.development';
 
 export class WebSocketService {
   private socket: WebSocket | null = null;

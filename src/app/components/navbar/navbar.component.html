@@ -1,3 +1,5 @@
+<!-- eslint-disable @angular-eslint/template/click-events-have-key-events -->
+<!-- eslint-disable @angular-eslint/template/interactive-supports-focus -->
 <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
   <div class="container-fluid">
     <a class="navbar-brand" href="#">UMLonk.dev</a>
@@ -14,10 +16,48 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav">
-        <li class="nav-item">
-          <button class="btn">
-            Crear sesión
-          </button>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Generate
+          </a>
+          <div class="dropdown-menu" style="width: 300px;">
+            <div class="px-4 py-3">
+              <div class="mb-3">
+                <label for="PromptInput" class="form-label">Prompt</label>
+                <input type="text" #PromptInput class="form-control" id="PromptInput" placeholder="Office">
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="radioDefault" id="radioDefault1" value="class" checked [(ngModel)]="selectedValue">
+                <label class="form-check-label" for="radioDefault1">
+                  Simple class
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="radioDefault" id="radioDefault2" value="compClass" [(ngModel)]="selectedValue">
+                <label class="form-check-label" for="radioDefault2">
+                  Complex class
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="radioDefault" id="radioDefault2" value="relation" [(ngModel)]="selectedValue">
+                <label class="form-check-label" for="radioDefault2">
+                  Relation
+                </label>
+              </div>
+              <div style="width: 100%; padding-top: 5px; display: flex; flex-direction: row; justify-content: center;">
+                <button (click)="SubmitPrompt(PromptInput.value)" [disabled]="PromptInput.value.length === 0" class="btn btn-primary">Submit</button>
+              </div>
+            </div>
+          </div>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Export
+          </a>
+          <div class="dropdown-menu">
+            <li><a class="dropdown-item" (click)="GeneratePNG()">PNG</a></li>
+            <li><a class="dropdown-item" (click)="GenerateJava()">Spring Project</a></li>
+          </div>
         </li>
       </ul>
     </div>
