@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
-import { CanvasComponent } from './components/canvas/canvas.component';
+import { AppComponent } from './app.component';
 
 export const routes: Routes = [
-  { path: '', component: CanvasComponent },
-  { path: 'session/:id', component: CanvasComponent },
+  { path: '', component: AppComponent },
+  { path: 'session/:id', component: AppComponent },
 ];

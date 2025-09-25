@@ -1,14 +1,9 @@
 import { DataType } from "./classproperty.interface";
 import { Multiplicity } from "./multiplicity.interface";
 
-export interface Property {
-  Name: string;
-  Type: DataType;
-}
-
-export interface Connection {
-  Class: ClassObject;
-  Multiplicity: Multiplicity;
+export interface DiagramObject {
+  Classes: ClassObject[];
+  Connectors: ConnectorObject[];
 }
 
 export interface ClassObject {
@@ -17,12 +12,24 @@ export interface ClassObject {
   Properties: Property[];
 }
 
+export interface Property {
+  Name: string;
+  Type: DataType;
+}
+
 export interface ConnectorObject {
   Source: Connection;
+  Type: ConnectorType;
   Target: Connection;
 }
 
-export interface DiagramObject {
-  Classes: ClassObject[];
-  Connectors: ConnectorObject[];
+export interface Connection {
+  Class: ClassObject;
+  Multiplicity: Multiplicity;
+}
+
+export enum ConnectorType {
+  Association = 'Association',
+  Composition = 'Composition',
+  Inheritance = 'Inheritance'
 }

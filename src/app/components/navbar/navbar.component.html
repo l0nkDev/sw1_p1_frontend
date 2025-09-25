@@ -25,8 +25,10 @@
               <div class="mb-3">
                 <label for="PromptInput" class="form-label">Prompt</label>
                 <div class="input-group mb-3">
-                  <input type="text" #PromptInput class="form-control" id="PromptInput" placeholder="Office">
-                  <button (click)="StartSpeechRecognition()" class="btn btn-outline-secondary">🎤</button>
+                  <input type="text" #PromptInput class="form-control" id="PromptInput" placeholder="Office" [ngModel]="prompt">
+                  @if (voiceRecognitionService.canListen) {
+                    <button (click)="onSpeechRecognitionButton()" class="btn btn-outline-secondary">{{voiceRecognitionService.isListening ? '🛑' : '🎤'}}</button>
+                  }
                 </div>
               </div>
               <div class="form-check">
@@ -48,7 +50,14 @@
                 </label>
               </div>
               <div style="width: 100%; padding-top: 5px; display: flex; flex-direction: row; justify-content: center;">
-                <button (click)="SubmitPrompt(PromptInput.value)" [disabled]="PromptInput.value.length === 0" class="btn btn-primary">Submit</button>
+                <button (click)="SubmitPrompt(PromptInput.value)" [disabled]="PromptInput.value.length === 0 || processing" class="btn btn-primary">
+                  @if (processing) {
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                  }
+                  @else {
+                    <span class="button-text">Submit</span>
+                  }
+                </button>
               </div>
             </div>
           </div>

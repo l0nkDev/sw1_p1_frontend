@@ -3,7 +3,7 @@ import { saveAs } from 'file-saver';
 import { Diagram } from '@syncfusion/ej2-angular-diagrams';
 import { DataType } from '../../interfaces/classproperty.interface';
 import { Multiplicity } from '../../interfaces/multiplicity.interface';
-import { ClassObject, ConnectorObject, DiagramObject } from '../../interfaces/serializedDiagram.interface';
+import { ClassObject, ConnectorObject, ConnectorType, DiagramObject } from '../../interfaces/serializedDiagram.interface';
 
 export class CodeGenerationService {
   public static async generateZipDownload(diagram: Diagram) {
@@ -90,6 +90,7 @@ export class CodeGenerationService {
             Class: this.GetClassObject(connector.sourceID, classes)!,
             Multiplicity: connector.annotations![0].content as Multiplicity,
           },
+          Type: connector.id?.startsWith('Association') ? ConnectorType.Association : connector.id?.startsWith('Inheritance') ? ConnectorType.Inheritance : ConnectorType.Composition,
           Target: {
             Class: this.GetClassObject(connector.targetID, classes)!,
             Multiplicity: connector.annotations![1].content as Multiplicity,
@@ -186,8 +187,10 @@ public class ${Ptitle}DTO {
       const target = connector.Target.Class;
       if (source.Id === classObject.Id || target.Id === classObject.Id) {
         const isSource = source.Id === classObject.Id;
-        if (this.IsOneToOne(connector)) {
+        if (this.IsOneToOne(connector) || (this.IsOneToMany(connector) && !isSource) || (this.IsManyToOne(connector) && isSource)) {
           string += `    private Long ${this.CamelCase(isSource ? target.Title : source.Title)}Id;\n`;
+        } else {
+          string += `    private List<Long> ${this.CamelCase(isSource ? target.Title : source.Title)}Ids;\n`;
         }
       }
     });
@@ -218,12 +221,32 @@ public class ${this.PascalCase(classObject.Title)} {
         const target = connector.Target.Class;
       if (source.Id === classObject.Id || target.Id === classObject.Id) {
         const isSource = connector.Source.Class.Id === classObject.Id;
+        const belongsToSource = connector.Source.Multiplicity === Multiplicity.ZeroToOne || connector.Target.Multiplicity === Multiplicity.One;
         if (this.IsOneToOne(connector)) {
-          const belongsToSource = connector.Source.Multiplicity === Multiplicity.ZeroToOne || connector.Target.Multiplicity === Multiplicity.One;
-          string += `    @OneToOne(${isSource === belongsToSource ? 'cascade=CascadeType.ALL' : `mappedBy = "${this.CamelCase(isSource ? source.Title : target.Title)}"`})\n`;
+          string += `    @OneToOne(${isSource === belongsToSource ? 'cascade=CascadeType.ALL' : `mappedBy="${this.CamelCase(isSource ? source.Title : target.Title)}"`})\n`;
           if (isSource === belongsToSource) string += `    @JoinColumn(name="${this.SnakeCase(isSource ? target.Title : source.Title)}_id")\n`;
-          string += `    private ${this.PascalCase(isSource ? target.Title : source.Title)} ${this.CamelCase(isSource ? target.Title : source.Title)}\n;`;
+          string += `    private ${this.PascalCase(isSource ? target.Title : source.Title)} ${this.CamelCase(isSource ? target.Title : source.Title)};\n`;
         }
+        if (this.IsOneToMany(connector) && !isSource || this.IsManyToOne(connector) && isSource) {
+          string += `    @ManyToOne\n`;
+          string += `    @JoinColumn(name="${this.SnakeCase(isSource ? target.Title : source.Title)}_id")\n`;
+          string += `    private ${this.PascalCase(isSource ? target.Title : source.Title)} ${this.CamelCase(isSource ? target.Title : source.Title)};\n`;
+        }
+        if (this.IsOneToMany(connector) && isSource || this.IsManyToOne(connector) && !isSource) {
+          string += `    @OneToMany(mappedBy="${this.CamelCase(isSource ? source.Title : target.Title)}")\n`;
+          string += `    private List<${this.PascalCase(isSource ? target.Title : source.Title)}> ${this.CamelCase(isSource ? target.Title : source.Title)}s;\n`;
+        }
+        if (this.IsManyToMany(connector)) {
+          string += `    @ManyToMany${isSource ? '' : `(mappedBy="${this.CamelCase(target.Title)}s")`}\n`;
+          if (isSource) {
+            string += `    @JoinTable(\n`;
+            string += `        name="${this.CamelCase(source.Title)}_${this.CamelCase(target.Title)}",\n`;
+            string += `        joinColumns = @JoinColumn(name="${this.SnakeCase(isSource ? source.Title : target.Title)}_id"),\n`;
+            string += `        inverseJoinColumns = @JoinColumn(name="${this.SnakeCase(isSource ? target.Title : source.Title)}_id"))\n`;
+          }
+          string += `    private List<${this.PascalCase(isSource ? target.Title : source.Title)}> ${this.CamelCase(isSource ? target.Title : source.Title)}s;\n`;
+        }
+        
       }
     });
     string += `}`;
@@ -251,21 +274,10 @@ public interface ${Ptitle}Repo extends JpaRepository<${Ptitle}, Long> {
     let string =
 `package com.umlonk.generated.service;
 
-import com.umlonk.generated.model.${Ptitle};
+import com.umlonk.generated.model.*;
 import com.umlonk.generated.dto.${Ptitle}DTO;
 import com.umlonk.generated.repo.${Ptitle}Repo;
-`;
-    connectors.forEach((connector) => {
-        const source = connector.Source.Class;
-        const target = connector.Target.Class;
-        if (source.Id === classObject.Id || target.Id === classObject.Id) {
-          const isSource = source.Id === classObject.Id;
-          if (this.IsOneToOne(connector)) {
-            string += `import com.umlonk.generated.model.${this.PascalCase(isSource ? target.Title : source.Title)};\n`;
-          }
-        }
-    });
-string += `import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import org.modelmapper.*;
@@ -296,8 +308,9 @@ public class ${Ptitle}Service {
       const target = connector.Target.Class;
       if (source.Id === classObject.Id || target.Id === classObject.Id) {
         const isSource = source.Id === classObject.Id;
-        if (this.IsOneToOne(connector))
+        if (this.IsOneToOne(connector) || (this.IsOneToMany(connector) && !isSource) || (this.IsManyToOne(connector) && isSource))
           string += `                    skip(destination.get${this.PascalCase(isSource ? target.Title : source.Title)}());\n`
+         else  string += `                    skip(destination.get${this.PascalCase(isSource ? target.Title : source.Title)}s());\n`
         }
       }
     );

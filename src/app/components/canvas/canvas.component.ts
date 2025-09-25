@@ -223,7 +223,7 @@ export class CanvasComponent implements OnInit {
         this.SelectedConnector = null;
         this.ClassName = this.getClassTitle(this.SelectedClass!);
         this.fillProperties(this.SelectedClass!);
-      } else if (id.startsWith('Association') || id.startsWith('Composition')) {
+      } else if (id.startsWith('Association') || id.startsWith('Composition') || id.startsWith('Inheritance')) {
         this.SelectedConnector = args.element.id;
         this.SelectedClass = null;
         const connector = this.diagram.getConnectorObject(id);
@@ -360,13 +360,13 @@ export class CanvasComponent implements OnInit {
     if (newConnector == null) return;
     const newConnectorObj: ConnectorModel = 
     {
-      id: ('association_' + Math.random().toString(36).substring(2, 15)).replace(' ', ''),
+      id: (newConnector.Type + Math.random().toString(36).substring(2, 15)).replace(' ', ''),
       sourceID: newConnector.Source.Class.Id,
       targetID: newConnector.Target.Class.Id,
       type: newConnector.Source.Class.Id === newConnector.Target.Class.Id ? 'Orthogonal' : 'Straight',
       shape: {
         type: 'UmlClassifier',
-        relationship: 'Association',
+        relationship: newConnector.Type,
         multiplicity: {
           type: 'ManyToMany',
           source: {

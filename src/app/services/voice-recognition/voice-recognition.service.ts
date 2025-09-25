@@ -1,31 +1,27 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable } from '@angular/core';
 
-  declare global {
-    interface Window {
-      SpeechRecognition: typeof SpeechRecognition;
-      webkitSpeechRecognition: typeof SpeechRecognition; // For broader browser compatibility
-    }
-  }
-
 @Injectable({
   providedIn: 'root',
 })
 
 export class VoiceRecognitionService {
-  ISpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-  recognition = new this.ISpeechRecognition();
+  recognition = window.SpeechRecognition ? new SpeechRecognition() : null;
+  canListen = false;
+  isListening = false;
   isStoppedSpeechRecog = false;
   tempWords = '';
   text = '';
 
   constructor() {
+    if (this.recognition == null) return;
+    this.canListen = true;
     this.recognition.interimResults = true;
-    this.recognition.lang = 'en-US';
+    this.recognition.lang = 'es-ES';
   }
 
   init() {
-    this.recognition.addEventListener('result', (event: any) => {
+    this.recognition!.addEventListener('result', (event: any) => {
       const transcript = Array.from(event.results)
         .map((result: any) => result[0])
         .map((result: any) => result.transcript)
@@ -36,24 +32,18 @@ export class VoiceRecognitionService {
 
   start() {
     this.isStoppedSpeechRecog = false;
-    this.recognition.start();
+    this.recognition!.start();
     console.log('Speech recognition started');
-
-    this.recognition.addEventListener('end', () => {
-      if (this.isStoppedSpeechRecog) {
-        this.recognition.stop();
-        console.log('End speech recognition');
-      } else {
-        this.wordConcat();
-        this.recognition.start();
-      }
-    });
+    this.wordConcat();
+    this.isListening = true;
+    this.recognition!.start();
   }
 
   stop() {
     this.isStoppedSpeechRecog = true;
     this.wordConcat();
-    this.recognition.stop();
+    this.recognition!.stop();
+    this.isListening = false;
     console.log('End speech recognition');
   }
 

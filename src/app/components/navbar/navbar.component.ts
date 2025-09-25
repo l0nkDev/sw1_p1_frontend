@@ -14,10 +14,12 @@ import { VoiceRecognitionService } from '../../services/voice-recognition/voice-
 })
 export class NavbarComponent implements OnInit{
   
-  private voiceRecognitionService = inject(VoiceRecognitionService);
+  public voiceRecognitionService = inject(VoiceRecognitionService);
   @ViewChild('PromptInput') private promptInput!: HTMLInputElement;
   @Input() canvas: CanvasComponent | null = null;
-  readonly http = inject(HttpClient)
+  readonly http = inject(HttpClient);
+  processing = false;
+  prompt = '';
   selectedValue = 'class';
   classDefinitions = 
 
@@ -50,6 +52,7 @@ export class NavbarComponent implements OnInit{
   
   export interface ConnectorObject {
     Source: Connection;
+    Type: ConnectorType;
     Target: Connection;
   }
   
@@ -64,17 +67,24 @@ export class NavbarComponent implements OnInit{
     Many = '*...*',
     ZeroToMany = '0...*',
     OneToMany = '1...*',
+  }
+
+  export enum ConnectorType {
+    Association = 'Association',
+    Composition = 'Composition',
+    Inheritance = 'Inheritance'
   }`
 
     ngOnInit() {
       this.voiceRecognitionService.init();
     }
 
-  public SubmitPrompt(prompt: string) {
+  public async SubmitPrompt(prompt: string) {
+    this.processing = true;
     switch (this.selectedValue) {
-      case 'class': { this.SubmitClassPrompt(prompt); break; }
-      case 'compClass': { this.SubmitCompClassPrompt(prompt); break; }
-      case 'relation': { this.SubmitRelationPrompt(prompt); break; }
+      case 'class': { await this.SubmitClassPrompt(prompt); break; }
+      case 'compClass': { await this.SubmitCompClassPrompt(prompt); break; }
+      case 'relation': { await this.SubmitRelationPrompt(prompt); break; }
     }
   }
 
@@ -104,6 +114,8 @@ export class NavbarComponent implements OnInit{
       const textJson: string = formattedText.substring(8, formattedText.length-4);
       const json = JSON.parse(textJson);
       this.canvas?.AddClass(json);
+      this.processing = false;
+      this.prompt = '';
     });
   }
 
@@ -116,7 +128,7 @@ export class NavbarComponent implements OnInit{
         {
             "parts": [
               {
-                "text": `Eres un simple traductor de lenguaje natural a una lista de objectos en formato JSON. Tu proposito es recibir un concepto o descripcion de una relacion o relaciones que se desean añadir a un diagrama de base de datos. Se te será proporcionada un objecto con una lista de clases y los conectores entre estos. Con esta informacion debes crear una lista de nuevos conectores que veas conveniente añadir basado en la informacion y la descripcion que se te dió. La clase 'Connector' tiene: Dos clases 'Connection', una llamada 'Source' y otra 'Target' que representan los dos lados de la asociacion. La clase 'Connection' tiene un objeto 'Class' el cual tiene una propiedad 'Id'. Ademas 'Connection' tiene una propiedad 'Multiplicity' la cual puede representar la cardinalidad en el lado correspondiente de la conexion con las siguientes opciones: '0...0', '0...1', '1...1', '0...*', '1...*' y '*...*'`
+                "text": `Eres un simple traductor de lenguaje natural a una lista de objectos en formato JSON. Tu proposito es recibir un concepto o descripcion de una relacion o relaciones que se desean añadir a un diagrama de base de datos. Se te será proporcionada un objecto con una lista de clases y los conectores entre estos. Con esta informacion debes crear una lista de nuevos conectores que veas conveniente añadir basado en la informacion y la descripcion que se te dió. La clase 'Connector' tiene: Dos clases 'Connection', una llamada 'Source' y otra 'Target' que representan los dos lados de la asociacion. La clase 'Connection' tiene un objeto 'Class' el cual tiene una propiedad 'Id'. Ademas 'Connection' tiene una propiedad 'Multiplicity' la cual puede representar la cardinalidad en el lado correspondiente de la conexion con las siguientes opciones: '0...0', '0...1', '1...1', '0...*', '1...*' y '*...*'. 'Conector' también tiene una propiedad 'Type' la cual indica el tipo de relacion que representa y puede tener los valores: 'Association', 'Inheritance' y 'Composition'`
               }
             ]
           },
@@ -138,6 +150,8 @@ export class NavbarComponent implements OnInit{
       json.forEach((connector) => {
         this.canvas?.AddConnector(connector);
       });
+      this.processing = false;
+      this.prompt = '';
     });
   }
 
@@ -175,6 +189,8 @@ export class NavbarComponent implements OnInit{
       json.Connectors.forEach((connector) => {
         this.canvas?.AddConnector(connector);
       });
+      this.processing = false;
+      this.prompt = '';
     });
   }
   
@@ -186,14 +202,18 @@ export class NavbarComponent implements OnInit{
     CodeGenerationService.generateZipDownload(this.canvas!.diagram);
   }
 
+  onSpeechRecognitionButton(): void {
+    if (this.voiceRecognitionService.isListening) this.StopSpeechRecognition();
+    else this.StartSpeechRecognition();
+  }
+
   StartSpeechRecognition(): void {
     this.voiceRecognitionService.start();
-    this.promptInput.value = 'lololol testeando xdd';
   }
 
   StopSpeechRecognition(): void {
     this.voiceRecognitionService.stop();
-    this.promptInput.value = this.voiceRecognitionService.text;
+    this.prompt = this.voiceRecognitionService.text;
     this.voiceRecognitionService.text = '';
   }
 }
