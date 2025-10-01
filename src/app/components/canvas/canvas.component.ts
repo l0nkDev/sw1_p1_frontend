@@ -227,7 +227,9 @@ export class CanvasComponent implements OnInit {
       } else if (
         id.startsWith('Association') ||
         id.startsWith('Composition') ||
-        id.startsWith('Inheritance')
+        id.startsWith('Inheritance') ||
+        id.startsWith('Aggregation') ||
+        id.startsWith('Dependency')
       ) {
         this.SelectedConnector = args.element.id;
         this.SelectedClass = null;

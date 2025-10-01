@@ -28,13 +28,13 @@ export class NavbarComponent implements OnInit {
     Classes: ClassObject[];
     Connectors: ConnectorObject[];
   }
-  
+
   export interface ClassObject {
     Id: string;
     Title: string;
     Properties: Property[];
   }
-  
+
   export interface Property {
     Name: string;
     Type: DataType;
@@ -50,18 +50,18 @@ export class NavbarComponent implements OnInit {
     character = "Character",
     byte = "Byte"
   }
-  
+
   export interface ConnectorObject {
     Source: Connection;
     Type: ConnectorType;
     Target: Connection;
   }
-  
+
   export interface Connection {
     Class: ClassObject;
     Multiplicity: Multiplicity;
   }
-  
+
   export enum Multiplicity {
     ZeroToOne = '0...1',
     One = '1...1',
@@ -73,7 +73,9 @@ export class NavbarComponent implements OnInit {
   export enum ConnectorType {
     Association = 'Association',
     Composition = 'Composition',
-    Inheritance = 'Inheritance'
+    Inheritance = 'Inheritance',
+    Dependency = 'Dependency',
+    Aggregation = 'Aggregation'
   }`;
 
   ngOnInit() {
@@ -161,7 +163,7 @@ export class NavbarComponent implements OnInit {
               ` '1...1', '0...*', '1...*' y '*...*'. 'Conector' también tiene` +
               ` una propiedad 'Type' la cual indica el tipo de relacion que r` +
               `epresenta y puede tener los valores: 'Association', 'Inheritan` +
-              `ce' y 'Composition'`,
+              `ce', 'Composition', 'Dependency' y 'Aggregation'`,
             },
           ],
         },
@@ -217,7 +219,10 @@ export class NavbarComponent implements OnInit {
               `umplir el formato PascalCase y no agregues ninguna propiedad d` +
               `e tipo Id a la lista 'Properties'. Al poblar el campo 'Multipl` +
               `icity' limitate a llenarlo con: '0...0', '0...1', '1...1', '0.` +
-              `..*', '1...*' y '*...*'`,
+              `..*', '1...*' y '*...*'. Asegurate de crear los tipos de relac` +
+              `iones que veas mas adecuado para cada relación. Las relaciones` +
+              `pueden ser de tipo: 'Association', 'Inheritance', 'Composition` +
+              `', 'Dependency' y 'Aggregation'`,
             },
           ],
         },

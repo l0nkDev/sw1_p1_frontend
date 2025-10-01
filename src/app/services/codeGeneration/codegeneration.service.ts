@@ -387,9 +387,11 @@ public class ${Ptitle}Service {
           target.Title : source.Title);
         if (this.isOneToOne(connector)) {
           string +=
-`        if (${Ctitle}DTO.get${property}Id() != null)
+`        if (${Ctitle}DTO.get${property}Id() != null) {
             ${Ctitle}.set${property}(entityManager.getReference(${property}` +
 `.class, ${Ctitle}DTO.get${property}Id()));
+            ${Ctitle}.get${property}().set${Ptitle}(${Ctitle});
+        }
         else ${Ctitle}.set${property}(null);\n`;
         }
       }

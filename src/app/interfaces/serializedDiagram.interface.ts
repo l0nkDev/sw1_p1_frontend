@@ -31,5 +31,7 @@ export interface Connection {
 export enum ConnectorType {
   Association = 'Association',
   Composition = 'Composition',
-  Inheritance = 'Inheritance'
+  Inheritance = 'Inheritance',
+  Dependency = 'Dependency',
+  Aggregation = 'Aggregation'
 }
