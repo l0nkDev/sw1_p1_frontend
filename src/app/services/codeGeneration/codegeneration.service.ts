@@ -251,10 +251,10 @@ public class ${this.pascalCase(classObject.Title)} {
             string +=
             `    @JoinColumn(name="` +
             `${this.snakeCase(isSource ? target.Title : source.Title)}_id")\n`;
-            string += `    private ${this.pascalCase(isSource ?
-              target.Title : source.Title)} ${this.camelCase(isSource ?
-                target.Title : source.Title)};\n`;
           }
+          string += `    private ${this.pascalCase(isSource ?
+            target.Title : source.Title)} ${this.camelCase(isSource ?
+              target.Title : source.Title)};\n`;
         }
         if (this.isOneToMany(connector) && !isSource ||
         this.isManyToOne(connector) && isSource) {
