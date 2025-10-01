@@ -1,6 +1,6 @@
-import { Component, ViewChild } from '@angular/core';
-import { NavbarComponent } from './components/navbar/navbar.component';
-import { CanvasComponent } from './components/canvas/canvas.component';
+import {Component, ViewChild} from '@angular/core';
+import {NavbarComponent} from './components/navbar/navbar.component';
+import {CanvasComponent} from './components/canvas/canvas.component';
 
 @Component({
   selector: 'app-root',

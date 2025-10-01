@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { VoiceRecognitionService } from './voice-recognition.service';
+import {VoiceRecognitionService} from './voice-recognition.service';
 
 describe('VoiceRecognitionService', () => {
   let service: VoiceRecognitionService;

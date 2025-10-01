@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 
 @Injectable({
   providedIn: 'root',
@@ -22,9 +22,9 @@ export class VoiceRecognitionService {
   init() {
     this.recognition!.addEventListener('result', (event: any) => {
       const transcript = Array.from(event.results)
-        .map((result: any) => result[0])
-        .map((result: any) => result.transcript)
-        .join('');
+          .map((result: any) => result[0])
+          .map((result: any) => result.transcript)
+          .join('');
       this.tempWords = transcript;
     });
   }

@@ -1,5 +1,5 @@
-import { Subject, Observable } from 'rxjs';
-import { environment } from '../../../environments/environment.development';
+import {Subject, Observable} from 'rxjs';
+import {environment} from '../../../environments/environment.development';
 
 export class WebSocketService {
   private socket: WebSocket | null = null;
@@ -12,7 +12,7 @@ export class WebSocketService {
   init(sessionId: string) {
     if (sessionId !== '') {
       this.socket = new WebSocket(
-        environment.wsUrl + `/session/${sessionId}`,
+          environment.wsUrl + `/session/${sessionId}`,
       );
 
       this.socket.onopen = (event) => {
@@ -34,7 +34,7 @@ export class WebSocketService {
   }
 
   sendMessage(message: string): void {
-    this.socket?.send(JSON.stringify({ message }));
+    this.socket?.send(JSON.stringify({message}));
   }
 
   getMessages(): Observable<string> {

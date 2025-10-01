@@ -1,5 +1,5 @@
-import { PaletteModel } from '@syncfusion/ej2-angular-diagrams';
-import { DataType } from '../interfaces/classproperty.interface';
+import {PaletteModel} from '@syncfusion/ej2-angular-diagrams';
+import {DataType} from '../interfaces/classproperty.interface';
 
 export class UMLElements {
   public static palettes: PaletteModel[] = [
@@ -15,7 +15,7 @@ export class UMLElements {
             type: 'UmlClassifier',
             classShape: {
               attributes: [{
-                name: "name", type: DataType.string
+                name: 'name', type: DataType.string,
               }],
               methods: [],
               name: 'Class',
@@ -24,9 +24,66 @@ export class UMLElements {
           },
         },
         {
+          id: 'Association',
+          type: 'Straight',
+          sourcePoint: {x: 700, y: 200},
+          targetPoint: {x: 800, y: 300},
+          shape: {
+            type: 'UmlClassifier',
+            relationship: 'Association',
+            multiplicity: {
+              type: 'ManyToMany',
+              source: {
+                optional: true,
+                lowerBounds: '1',
+                upperBounds: '1',
+              },
+              target: {optional: true, lowerBounds: '1', upperBounds: '1'},
+            },
+          },
+        },
+        {
+          id: 'Dependency',
+          type: 'Straight',
+          sourcePoint: {x: 700, y: 200},
+          targetPoint: {x: 800, y: 300},
+          shape: {
+            type: 'UmlClassifier',
+            relationship: 'Dependency',
+            multiplicity: {
+              type: 'ManyToMany',
+              source: {
+                optional: true,
+                lowerBounds: '1',
+                upperBounds: '1',
+              },
+              target: {optional: true, lowerBounds: '1', upperBounds: '1'},
+            },
+          },
+        },
+        {
+          id: 'Aggregation',
+          type: 'Straight',
+          sourcePoint: {x: 700, y: 200},
+          targetPoint: {x: 800, y: 300},
+          shape: {
+            type: 'UmlClassifier',
+            relationship: 'Aggregation',
+            multiplicity: {
+              type: 'ManyToMany',
+              source: {
+                optional: true,
+                lowerBounds: '1',
+                upperBounds: '1',
+              },
+              target: {optional: true, lowerBounds: '1', upperBounds: '1'},
+            },
+          },
+        },
+        {
           id: 'Composition',
-          sourcePoint: { x: 100, y: 200 },
-          targetPoint: { x: 200, y: 300 },
+          sourcePoint: {x: 100, y: 200},
+          targetPoint: {x: 200, y: 300},
           type: 'Straight',
           shape: {
             type: 'UmlClassifier',
@@ -38,36 +95,17 @@ export class UMLElements {
                 lowerBounds: '1',
                 upperBounds: '1',
               },
-              target: { optional: true, lowerBounds: '1', upperBounds: '1' },
+              target: {optional: true, lowerBounds: '1', upperBounds: '1'},
             },
-          },
-        },
-        {
-          id: 'Association',
-          type: 'Straight',
-          sourcePoint: { x: 700, y: 200 },
-          targetPoint: { x: 800, y: 300 },
-          shape: {
-            type: 'UmlClassifier',
-            relationship: 'Association',
-            multiplicity: {
-              type: 'ManyToMany',
-              source: {
-                optional: true,
-                lowerBounds: '1',
-                upperBounds: '1',
-              },
-              target: { optional: true, lowerBounds: '1', upperBounds: '1' },
-            }
           },
         },
         {
           id: 'Inheritance',
           type: 'Straight',
-          sourcePoint: { x: 900, y: 200 },
-          targetPoint: { x: 1000, y: 300 },
-          shape: { 
-            type: 'UmlClassifier', 
+          sourcePoint: {x: 900, y: 200},
+          targetPoint: {x: 1000, y: 300},
+          shape: {
+            type: 'UmlClassifier',
             relationship: 'Inheritance',
             multiplicity: {
               type: 'ManyToMany',
@@ -76,10 +114,10 @@ export class UMLElements {
                 lowerBounds: '1',
                 upperBounds: '1',
               },
-              target: { optional: true, lowerBounds: '1', upperBounds: '1' },
-            }
+              target: {optional: true, lowerBounds: '1', upperBounds: '1'},
+            },
           },
-        }
+        },
       ],
     },
   ];

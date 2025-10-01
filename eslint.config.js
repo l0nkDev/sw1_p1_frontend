@@ -2,7 +2,6 @@ const eslint = require('@eslint/js');
 const tseslint = require('typescript-eslint');
 const angular = require('angular-eslint');
 const eslintConfigGoogle = require('eslint-config-google');
-const jsdoc = require('eslint-plugin-jsdoc')
 
 
 module.exports = tseslint.config(
@@ -12,15 +11,31 @@ module.exports = tseslint.config(
       eslint.configs.recommended,
       ...tseslint.configs.recommended,
       ...tseslint.configs.stylistic,
+      eslintConfigGoogle,
       ...angular.configs.tsRecommended,
     ],
-    plugins: {
-      jsdoc: jsdoc
-    },
     rules: {
-      "jsdoc/require-description": "warn",
-      "jsdoc/valid-types": "error",
-      "@typescript-eslint/no-explicit-any": "off"
+      "valid-jsdoc": "off",
+      "require-jsdoc": "off",
+      "@typescript-eslint/no-explicit-any": "off",
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": "error",
+      "new-cap": [
+      "error",
+      {
+        "capIsNewExceptions": [
+          "Component",
+          "Input",
+          "Output",
+          "Directive",
+          "Injectable",
+          "ViewChild",
+          "Pipe"
+        ],
+        "newIsCapExceptions": []
+      }
+    ]
+
     },
   },
 );

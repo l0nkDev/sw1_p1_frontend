@@ -6,13 +6,13 @@ export interface ClassProperty {
 }
 
 export enum DataType {
-  integer = "Integer",
-  long = "Long",
-  short = "Short",
-  float = "Float",
-  double = "Double",
-  string = "String",
-  boolean = "Boolean",
-  character = "Character",
-  byte = "Byte"
+  integer = 'Integer',
+  long = 'Long',
+  short = 'Short',
+  float = 'Float',
+  double = 'Double',
+  string = 'String',
+  boolean = 'Boolean',
+  character = 'Character',
+  byte = 'Byte'
 }

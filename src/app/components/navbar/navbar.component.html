@@ -48,7 +48,7 @@
                 </label>
               </div>
               <div style="width: 100%; padding-top: 5px; display: flex; flex-direction: row; justify-content: center;">
-                <button (click)="SubmitPrompt(PromptInput.value)" [disabled]="PromptInput.value.length === 0 || processing" class="btn btn-primary">
+                <button (click)="submitPrompt(PromptInput.value)" [disabled]="PromptInput.value.length === 0 || processing" class="btn btn-primary">
                   @if (processing) {
                     <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                   }
@@ -65,8 +65,8 @@
             Export
           </a>
           <div class="dropdown-menu">
-            <li><a class="dropdown-item" (click)="GeneratePNG()">PNG</a></li>
-            <li><a class="dropdown-item" (click)="GenerateJava()">Spring Project</a></li>
+            <li><a class="dropdown-item" (click)="generatePNG()">PNG</a></li>
+            <li><a class="dropdown-item" (click)="generateJava()">Spring Project</a></li>
           </div>
         </li>
       </ul>

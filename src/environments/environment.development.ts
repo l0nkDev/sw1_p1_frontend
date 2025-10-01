@@ -1,4 +1,4 @@
 export const environment = {
-    production: false,
-    wsUrl: 'wss://websocket.lonk.dev/ws',
+  production: false,
+  wsUrl: 'wss://websocket.lonk.dev/ws',
 };

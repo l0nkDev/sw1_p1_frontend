@@ -1,5 +1,5 @@
-import { DataType } from "./classproperty.interface";
-import { Multiplicity } from "./multiplicity.interface";
+import {DataType} from './classproperty.interface';
+import {Multiplicity} from './multiplicity.interface';
 
 export interface DiagramObject {
   Classes: ClassObject[];
