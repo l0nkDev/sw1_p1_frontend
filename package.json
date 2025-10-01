@@ -7,7 +7,13 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "fix": "gts fix",
+    "prepare": "npm.cmd run compile",
+    "pretest": "npm.cmd run compile",
+    "posttest": "npm.cmd run lint"
   },
   "private": true,
   "dependencies": {
@@ -52,7 +58,9 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "prettier": "^3.6.2",
     "prettier-eslint": "^16.4.2",
-    "typescript": "~5.7.2",
-    "typescript-eslint": "8.40.0"
+    "typescript": "^5.6.3",
+    "typescript-eslint": "8.40.0",
+    "gts": "^6.0.2",
+    "@types/node": "^22.7.5"
   }
 }
