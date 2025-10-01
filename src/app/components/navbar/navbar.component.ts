@@ -8,6 +8,7 @@ import {CodeGenerationService}
   from '../../services/codeGeneration/codegeneration.service';
 import {VoiceRecognitionService}
   from '../../services/voice-recognition/voice-recognition.service';
+import {saveAs} from 'file-saver';
 
 @Component({
   selector: 'app-navbar',
@@ -261,6 +262,34 @@ export class NavbarComponent implements OnInit {
 
   generateJava(): void {
     CodeGenerationService.generateZipDownload(this.canvas!.diagram);
+  }
+
+  generateJson(): void {
+    const data: string = this.canvas?.diagram.saveDiagram() as string;
+    const blob = new Blob([data], {type: 'application/json'});
+    saveAs( blob, 'diagram.json');
+  }
+
+  async loadJson(): Promise<void> {
+    // Check for API support
+    if (!('showOpenFilePicker' in window)) {
+      alert('Your browser does not support the File System Access API.');
+      return;
+    }
+
+    try {
+      // Prompt the user to select one or more files
+      const fileHandles = await window.showOpenFilePicker({
+        multiple: true,
+      });
+      for (const handle of fileHandles) {
+        const file = await handle.getFile();
+        const content = await file.text();
+        console.log(`File "${file.name}" content:`, content);
+      }
+    } catch (err) {
+      console.error('File access error:', err);
+    }
   }
 
   onSpeechRecognitionButton(): void {

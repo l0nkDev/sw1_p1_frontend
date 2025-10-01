@@ -14,5 +14,7 @@ export enum DataType {
   string = 'String',
   boolean = 'Boolean',
   character = 'Character',
-  byte = 'Byte'
+  byte = 'Byte',
+  localdate = 'LocalDate',
+  localdatetime = 'LocalDateTime'
 }

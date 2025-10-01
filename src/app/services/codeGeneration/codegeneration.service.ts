@@ -183,6 +183,7 @@ public class ${Ptitle}Controller {
 import jakarta.persistence.Entity;
 import java.util.List;
 import lombok.*;
+import java.time.*;
 
 @Data
 @NoArgsConstructor
@@ -220,6 +221,7 @@ public class ${Ptitle}DTO {
 `import jakarta.persistence.*;
 import java.util.List;
 import lombok.*;
+import java.time.*;
 
 @Entity
 @NoArgsConstructor

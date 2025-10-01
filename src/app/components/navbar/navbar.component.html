@@ -65,9 +65,15 @@
             Export
           </a>
           <div class="dropdown-menu">
+            <li><a class="dropdown-item" (click)="generateJson()">JSON</a></li>
             <li><a class="dropdown-item" (click)="generatePNG()">PNG</a></li>
             <li><a class="dropdown-item" (click)="generateJava()">Spring Project</a></li>
           </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" role="button" aria-expanded="false" (click)="loadJson()">
+            Import
+          </a>
         </li>
       </ul>
     </div>
