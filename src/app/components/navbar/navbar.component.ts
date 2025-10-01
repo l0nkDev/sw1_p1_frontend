@@ -285,7 +285,7 @@ export class NavbarComponent implements OnInit {
       for (const handle of fileHandles) {
         const file = await handle.getFile();
         const content = await file.text();
-        console.log(`File "${file.name}" content:`, content);
+        this.canvas?.diagram.loadDiagram(content);
       }
     } catch (err) {
       console.error('File access error:', err);
