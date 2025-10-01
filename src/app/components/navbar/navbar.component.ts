@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { ConnectorObject, DiagramObject } from '../../interfaces/serializedDiagram.interface';

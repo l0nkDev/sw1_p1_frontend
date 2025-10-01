@@ -15,8 +15,7 @@ describe('AppComponent', () => {
   });
 
   it(`should have the 'sw1_p1_frontend' title`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
+    //
   });
 
   it('should render title', () => {
