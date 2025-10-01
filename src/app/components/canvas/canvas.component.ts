@@ -3,7 +3,6 @@ import {
   ClassProperty,
   DataType,
 } from './../../interfaces/classproperty.interface';
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Component,
   ViewEncapsulation,
@@ -358,7 +357,7 @@ export class CanvasComponent implements OnInit {
 
   public AddConnector(newConnector: ConnectorObject | null): void {
     if (newConnector == null) return;
-    const newConnectorObj: ConnectorModel = 
+    const newConnectorObj: ConnectorModel =
     {
       id: (newConnector.Type + Math.random().toString(36).substring(2, 15)).replace(' ', ''),
       sourceID: newConnector.Source.Class.Id,
@@ -374,10 +373,10 @@ export class CanvasComponent implements OnInit {
             lowerBounds: newConnector.Source.Multiplicity.split('...')[0],
             upperBounds: newConnector.Source.Multiplicity.split('...')[1],
           },
-          target: { 
-            optional: true, 
-            lowerBounds: newConnector.Target.Multiplicity.split('...')[0], 
-            upperBounds: newConnector.Target.Multiplicity.split('...')[1] 
+          target: {
+            optional: true,
+            lowerBounds: newConnector.Target.Multiplicity.split('...')[0],
+            upperBounds: newConnector.Target.Multiplicity.split('...')[1]
           },
         },
       },
