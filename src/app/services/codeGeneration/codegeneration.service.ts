@@ -6,7 +6,6 @@ import { Multiplicity } from '../../interfaces/multiplicity.interface';
 import { ClassObject, ConnectorObject, ConnectorType, DiagramObject } from '../../interfaces/serializedDiagram.interface';
 
 export class CodeGenerationService {
-
   public static async generateZipDownload(diagram: Diagram) {
     const zip = new JSZip();
     const jsonData = this.ObjectFromDiagram(diagram);
@@ -247,7 +246,7 @@ public class ${this.PascalCase(classObject.Title)} {
           }
           string += `    private List<${this.PascalCase(isSource ? target.Title : source.Title)}> ${this.CamelCase(isSource ? target.Title : source.Title)}s;\n`;
         }
-
+        
       }
     });
     string += `}`;
