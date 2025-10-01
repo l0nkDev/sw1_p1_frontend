@@ -93,7 +93,7 @@ export class NavbarComponent implements OnInit {
   }
 
   public async submitClassPrompt(prompt: string): Promise<void> {
-    this.http.post('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+    await this.http.post('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
         {
           'system_instruction': {
             'parts': [
@@ -109,7 +109,8 @@ export class NavbarComponent implements OnInit {
                   'propiedad formateado en PascalCase y el campo \'Type\' ' +
                   'en el cual debes escoger el tipo mas adecuado para la ' +
                   'propiedad entre las siguientes opciones: Integer, Long, ' +
-                  'Short, Float, Double, String, Boolean, Character y Byte. ' +
+                  'Short, Float, Double, String, Boolean, Character, Byte, ' +
+                  'LocalDate y LocalDateTime. ' +
                   'No agregues una propiedad Id o similar.',
               },
             ],
